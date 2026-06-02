@@ -70,6 +70,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ./conformance
 
+      - name: Install aaep-minimal-producer (local dependency)
+        run: pip install -e ./examples/producers/python-minimal
+
       - name: Install producer ${{ matrix.producer }}
         working-directory: examples/producers/${{ matrix.producer }}
         run: pip install -e .
@@ -81,17 +84,16 @@ jobs:
           MICROSOFT_AGENT_FRAMEWORK_CLIENT_ID: "test-id"
         run: |
           case "${{ matrix.producer }}" in
-            python-minimal) PORT=8080 ;;
-            python-langchain) PORT=8081 ;;
-            python-anthropic-sdk) PORT=8082 ;;
-            python-microsoft-agent-framework) PORT=8083 ;;
+            python-minimal) PORT=8080; MODULE=aaep_minimal_producer ;;
+            python-langchain) PORT=8081; MODULE=aaep_langchain ;;
+            python-anthropic-sdk) PORT=8082; MODULE=aaep_anthropic_sdk ;;
+            python-microsoft-agent-framework) PORT=8083; MODULE=aaep_maf ;;
           esac
-          echo "Starting on port $PORT"
-          MODULE_NAME=$(echo "${{ matrix.producer }}" | tr '-' '_')
-          python -m "${MODULE_NAME}.server" --port "$PORT" > /tmp/producer.log 2>&1 &
+          echo "Starting $MODULE on port $PORT"
+          python -m "${MODULE}.server" --port "$PORT" > /tmp/producer.log 2>&1 &
           echo $! > /tmp/producer.pid
           for i in $(seq 1 30); do
-            if curl -sf "http://localhost:$PORT/health" > /dev/null; then
+            if curl -sf "http://localhost:$PORT/healthz" > /dev/null; then
               echo "Producer ready on port $PORT"
               echo "PRODUCER_PORT=$PORT" >> "$GITHUB_ENV"
               exit 0
@@ -127,7 +129,7 @@ jobs:
       - name: Stop producer
         if: always()
         run: |
-          if [[ -f /tmp/producer.pid ]]; then
+          if [ -f /tmp/producer.pid ]; then
             kill "$(cat /tmp/producer.pid)" || true
           fi
           echo "--- producer logs ---"
@@ -156,14 +158,16 @@ jobs:
       - name: Start producer in background
         working-directory: examples/producers/typescript-minimal
         run: |
-          npm run start -- --port 8084 > /tmp/producer.log 2>&1 &
+          PORT=8084 npm run server > /tmp/producer.log 2>&1 &
           echo $! > /tmp/producer.pid
           for i in $(seq 1 30); do
-            if curl -sf "http://localhost:8084/health" > /dev/null; then
+            if curl -sf "http://localhost:8084/healthz" > /dev/null; then
+              echo "TypeScript producer ready on port 8084"
               exit 0
             fi
             sleep 1
           done
+          echo "TypeScript producer failed to start. Logs:"
           cat /tmp/producer.log
           exit 1
 
@@ -176,7 +180,7 @@ jobs:
       - name: Install conformance suite
         run: pip install -e ./conformance
 
-      - name: Run all levels
+      - name: Run levels 1 and 2
         run: |
           for level in 1 2; do
             python -m aaep_conformance.cli producer \
@@ -193,17 +197,30 @@ jobs:
           path: /tmp/level*.json
           retention-days: 30
 
+      - name: Stop producer
+        if: always()
+        run: |
+          if [ -f /tmp/producer.pid ]; then
+            kill "$(cat /tmp/producer.pid)" || true
+          fi
+          echo "--- producer logs ---"
+          cat /tmp/producer.log || true
+
   conformance-gate:
     name: Conformance gate
     if: always()
     needs:
       - conformance-self-test
+      - python-producers
+      - typescript-producer
     runs-on: ubuntu-latest
     steps:
-      - name: Check self-test
+      - name: Check upstream results
         run: |
-          if [[ "${{ needs.conformance-self-test.result }}" != "success" ]]; then
+          if [ "${{ needs.conformance-self-test.result }}" != "success" ]; then
             echo "Conformance self-test FAILED"
             exit 1
           fi
-          echo "Conformance self-test passed."
+          echo "Self-test passed. Producer matrix results:"
+          echo "  python-producers: ${{ needs.python-producers.result }}"
+          echo "  typescript-producer: ${{ needs.typescript-producer.result }}"

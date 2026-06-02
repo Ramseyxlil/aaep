@@ -15,7 +15,7 @@
 import { randomBytes } from "node:crypto";
 import type {
     AAEPEvent,
-    Capabilities,
+
     Decision,
     ErrorCategory,
     Producer,
