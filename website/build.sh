@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # AAEP website build script.
+# Renders all markdown content into a complete static website.
+# Aggressively rewrites broken repo-relative links to working URLs.
 
 set -e
 
@@ -44,7 +46,7 @@ log "Writing CNAME for custom domain"
 echo "aaep-protocol.org" > "$DIST/CNAME"
 
 if [[ -d "$ROOT/schemas" ]]; then
-  log "Copying JSON schemas"
+  log "Copying JSON schemas to /schemas/v1/"
   mkdir -p "$DIST/schemas/v1"
   cp -r "$ROOT/schemas/"* "$DIST/schemas/v1/"
 fi
@@ -64,11 +66,24 @@ TEMPLATE_PATH = ROOT / "website" / "src" / "_template.html"
 GITHUB_REPO_BASE = "https://github.com/Ramseyxlil/aaep/tree/main/"
 GITHUB_BLOB_BASE = "https://github.com/Ramseyxlil/aaep/blob/main/"
 
+# Directories that exist in the repo but are NOT rendered to HTML.
+# Links to these get redirected to GitHub.
 NON_RENDERED_REPO_DIRS = [
     "examples",
     "conformance",
     "tools",
+    ".github",
 ]
+
+# Directories that ARE rendered but at a different path on the website.
+# Maps source-tree path -> website URL path.
+RELOCATED_REPO_DIRS = {
+    "schemas/core": "/schemas/v1/core",
+    "schemas/handshake": "/schemas/v1/handshake",
+    "schemas/context": "/schemas/v1/context",
+    "schemas/envelope.schema.json": "/schemas/v1/envelope.schema.json",
+    "schemas": "/schemas/v1",
+}
 
 template = TEMPLATE_PATH.read_text(encoding="utf-8")
 
@@ -101,52 +116,73 @@ def file_title(path: Path) -> str:
     name = name.replace("-", " ").replace("_", " ")
     return name.title()
 
-def rewrite_links(html: str) -> str:
-    """Rewrite three classes of broken links in rendered HTML.
+# Track unresolved internal links so we can report them.
+unresolved_links = []
 
-    1. Relative paths to non-rendered repo directories (examples/, conformance/,
-       tools/) -> absolute GitHub tree/blob URLs.
-    2. Markdown file references (.md) -> their HTML equivalents (.html).
-    3. Absolute URLs to aaep-protocol.org that still end in .md -> .html.
+def rewrite_links(html: str, source_section: str) -> str:
+    """Rewrite internal links so every one works on the deployed site.
+
+    Pass 1: Markdown source paths that don't render to HTML → GitHub URLs.
+    Pass 2: Source paths that relocated on the website (e.g. schemas/core → /schemas/v1/core).
+    Pass 3: .md → .html
+    Pass 4: Track any remaining suspicious-looking internal links.
     """
-    # Pass 1: relative repo links to non-rendered dirs
-    def replace_repo_link(match):
+
+    # ---- Pass 1: relative repo links to non-rendered dirs → GitHub ----
+    def replace_non_rendered(match):
         href = match.group(1)
         stripped = re.sub(r"^(\.\./)+", "", href)
         for non_rendered in NON_RENDERED_REPO_DIRS:
-            if stripped.startswith(non_rendered + "/") or stripped == non_rendered + "/" or stripped == non_rendered:
+            if stripped == non_rendered or stripped.startswith(non_rendered + "/"):
+                # Heuristic: trailing slash or no extension → tree, else blob
                 if stripped.endswith("/") or "." not in stripped.split("/")[-1]:
                     return f'href="{GITHUB_REPO_BASE}{stripped}"'
                 return f'href="{GITHUB_BLOB_BASE}{stripped}"'
         return match.group(0)
 
     html = re.sub(
-        r'href="((?:\.\./)+(?:examples|conformance|tools)[^"]*)"',
-        replace_repo_link,
+        r'href="((?:\.\./)+(?:' + "|".join(NON_RENDERED_REPO_DIRS) + r')[^"]*)"',
+        replace_non_rendered,
         html,
     )
 
-    # Pass 2: relative .md links -> .html links
-    # Matches href="something.md" or href="something.md#anchor"
-    # Doesn't touch absolute URLs that happen to contain .md
-    def replace_md_link(match):
+    # ---- Pass 2: relocated dirs ----
+    def replace_relocated(match):
         href = match.group(1)
-        anchor = match.group(2) or ""
-        return f'href="{href}.html{anchor}"'
+        stripped = re.sub(r"^(\.\./)+", "", href)
+        # Find the longest matching prefix in RELOCATED_REPO_DIRS
+        for src, dst in sorted(RELOCATED_REPO_DIRS.items(), key=lambda kv: -len(kv[0])):
+            if stripped == src:
+                return f'href="{dst}"'
+            if stripped.startswith(src + "/"):
+                tail = stripped[len(src):]
+                return f'href="{dst}{tail}"'
+        return match.group(0)
 
+    relocated_pattern = (
+        r'href="((?:\.\./)+(?:'
+        + "|".join(re.escape(k) for k in RELOCATED_REPO_DIRS.keys())
+        + r')[^"]*)"'
+    )
+    html = re.sub(relocated_pattern, replace_relocated, html)
+
+    # ---- Pass 3: .md → .html (relative + absolute aaep-protocol.org) ----
     html = re.sub(
         r'href="((?!https?://|mailto:|#)[^"]*?)\.md(#[^"]*)?"',
-        replace_md_link,
+        lambda m: f'href="{m.group(1)}.html{m.group(2) or ""}"',
         html,
     )
-
-    # Pass 3: absolute aaep-protocol.org links that end in .md -> .html
-    # (handles cases where source had a hardcoded full URL with .md)
     html = re.sub(
         r'href="(https?://aaep-protocol\.org/[^"]*?)\.md(#[^"]*)?"',
         lambda m: f'href="{m.group(1)}.html{m.group(2) or ""}"',
         html,
     )
+
+    # ---- Pass 4: find remaining suspicious links to flag ----
+    # Anything starting with ../ that still looks like a repo path
+    suspicious = re.findall(r'href="((?:\.\./)+[^"]+)"', html)
+    for s in suspicious:
+        unresolved_links.append((source_section, s))
 
     return html
 
@@ -156,7 +192,7 @@ def render_md(md_path: Path, out_path: Path, section: str, breadcrumb: str):
     first_h1 = re.search(r"^#\s+(.+)$", content_md, re.MULTILINE)
     page_title = first_h1.group(1).strip() if first_h1 else file_title(md_path)
     content_html = md.convert(content_md)
-    content_html = rewrite_links(content_html)
+    content_html = rewrite_links(content_html, f"{section}/{md_path.name}")
     output = (
         template
         .replace("{{PAGE_TITLE}}", page_title)
@@ -242,7 +278,18 @@ if schemas_dir.exists():
     (schemas_dir / "index.html").write_text(output, encoding="utf-8")
     rendered_count += 1
 
-print(f"  Rendered {rendered_count} HTML pages with link rewriting")
+print(f"  Rendered {rendered_count} HTML pages")
+
+if unresolved_links:
+    print(f"\n  ⚠ {len(unresolved_links)} suspicious link(s) remain (still relative ../):")
+    for section, link in unresolved_links[:20]:
+        print(f"      {section}: {link}")
+    if len(unresolved_links) > 20:
+        print(f"      ... and {len(unresolved_links) - 20} more")
+    print("\n  These may render as broken on the website. Review and add to")
+    print("  NON_RENDERED_REPO_DIRS or RELOCATED_REPO_DIRS in build.sh if needed.")
+else:
+    print("  ✓ All internal links resolved")
 PYEOF
 
 log "Validating output structure"
