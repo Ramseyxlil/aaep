@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # AAEP website build script.
-# Renders all markdown content into a complete static website.
-# Aggressively rewrites broken repo-relative links to working URLs.
 
 set -e
 
@@ -66,8 +64,6 @@ TEMPLATE_PATH = ROOT / "website" / "src" / "_template.html"
 GITHUB_REPO_BASE = "https://github.com/Ramseyxlil/aaep/tree/main/"
 GITHUB_BLOB_BASE = "https://github.com/Ramseyxlil/aaep/blob/main/"
 
-# Directories that exist in the repo but are NOT rendered to HTML.
-# Links to these get redirected to GitHub.
 NON_RENDERED_REPO_DIRS = [
     "examples",
     "conformance",
@@ -75,28 +71,18 @@ NON_RENDERED_REPO_DIRS = [
     ".github",
 ]
 
-# Directories that ARE rendered but at a different path on the website.
-# Maps source-tree path -> website URL path.
 RELOCATED_REPO_DIRS = {
     "schemas/core": "/schemas/v1/core",
     "schemas/handshake": "/schemas/v1/handshake",
     "schemas/context": "/schemas/v1/context",
-    "schemas/envelope.schema.json": "/schemas/v1/envelope.schema.json",
-    "schemas": "/schemas/v1",
 }
 
 template = TEMPLATE_PATH.read_text(encoding="utf-8")
 
 md = markdown.Markdown(
     extensions=[
-        "fenced_code",
-        "tables",
-        "toc",
-        "attr_list",
-        "def_list",
-        "abbr",
-        "footnotes",
-        "codehilite",
+        "fenced_code", "tables", "toc", "attr_list",
+        "def_list", "abbr", "footnotes", "codehilite",
     ],
     extension_configs={
         "codehilite": {"css_class": "code", "guess_lang": False},
@@ -116,25 +102,14 @@ def file_title(path: Path) -> str:
     name = name.replace("-", " ").replace("_", " ")
     return name.title()
 
-# Track unresolved internal links so we can report them.
 unresolved_links = []
 
 def rewrite_links(html: str, source_section: str) -> str:
-    """Rewrite internal links so every one works on the deployed site.
-
-    Pass 1: Markdown source paths that don't render to HTML → GitHub URLs.
-    Pass 2: Source paths that relocated on the website (e.g. schemas/core → /schemas/v1/core).
-    Pass 3: .md → .html
-    Pass 4: Track any remaining suspicious-looking internal links.
-    """
-
-    # ---- Pass 1: relative repo links to non-rendered dirs → GitHub ----
     def replace_non_rendered(match):
         href = match.group(1)
         stripped = re.sub(r"^(\.\./)+", "", href)
         for non_rendered in NON_RENDERED_REPO_DIRS:
             if stripped == non_rendered or stripped.startswith(non_rendered + "/"):
-                # Heuristic: trailing slash or no extension → tree, else blob
                 if stripped.endswith("/") or "." not in stripped.split("/")[-1]:
                     return f'href="{GITHUB_REPO_BASE}{stripped}"'
                 return f'href="{GITHUB_BLOB_BASE}{stripped}"'
@@ -142,15 +117,12 @@ def rewrite_links(html: str, source_section: str) -> str:
 
     html = re.sub(
         r'href="((?:\.\./)+(?:' + "|".join(NON_RENDERED_REPO_DIRS) + r')[^"]*)"',
-        replace_non_rendered,
-        html,
+        replace_non_rendered, html,
     )
 
-    # ---- Pass 2: relocated dirs ----
     def replace_relocated(match):
         href = match.group(1)
         stripped = re.sub(r"^(\.\./)+", "", href)
-        # Find the longest matching prefix in RELOCATED_REPO_DIRS
         for src, dst in sorted(RELOCATED_REPO_DIRS.items(), key=lambda kv: -len(kv[0])):
             if stripped == src:
                 return f'href="{dst}"'
@@ -159,14 +131,14 @@ def rewrite_links(html: str, source_section: str) -> str:
                 return f'href="{dst}{tail}"'
         return match.group(0)
 
-    relocated_pattern = (
-        r'href="((?:\.\./)+(?:'
-        + "|".join(re.escape(k) for k in RELOCATED_REPO_DIRS.keys())
-        + r')[^"]*)"'
-    )
-    html = re.sub(relocated_pattern, replace_relocated, html)
+    if RELOCATED_REPO_DIRS:
+        relocated_pattern = (
+            r'href="((?:\.\./)+(?:'
+            + "|".join(re.escape(k) for k in RELOCATED_REPO_DIRS.keys())
+            + r')[^"]*)"'
+        )
+        html = re.sub(relocated_pattern, replace_relocated, html)
 
-    # ---- Pass 3: .md → .html (relative + absolute aaep-protocol.org) ----
     html = re.sub(
         r'href="((?!https?://|mailto:|#)[^"]*?)\.md(#[^"]*)?"',
         lambda m: f'href="{m.group(1)}.html{m.group(2) or ""}"',
@@ -178,8 +150,6 @@ def rewrite_links(html: str, source_section: str) -> str:
         html,
     )
 
-    # ---- Pass 4: find remaining suspicious links to flag ----
-    # Anything starting with ../ that still looks like a repo path
     suspicious = re.findall(r'href="((?:\.\./)+[^"]+)"', html)
     for s in suspicious:
         unresolved_links.append((source_section, s))
@@ -278,16 +248,39 @@ if schemas_dir.exists():
     (schemas_dir / "index.html").write_text(output, encoding="utf-8")
     rendered_count += 1
 
+# Generate redirect stubs (meta-refresh) for relocated paths so
+# typing the old URL directly redirects to the new one.
+# GitHub Pages doesn't support server-side 301s, so this is the best we can do.
+redirect_count = 0
+for src, dst in RELOCATED_REPO_DIRS.items():
+    src_dir = DIST / src
+    if (src_dir / "index.html").exists():
+        continue  # Don't overwrite real content
+    src_dir.mkdir(parents=True, exist_ok=True)
+    stub = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Redirecting to {dst}/ — AAEP</title>
+<meta http-equiv="refresh" content="0; url={dst}/">
+<link rel="canonical" href="{dst}/">
+</head>
+<body>
+<p>This page has moved to <a href="{dst}/">{dst}/</a>.</p>
+</body>
+</html>"""
+    (src_dir / "index.html").write_text(stub, encoding="utf-8")
+    redirect_count += 1
+
 print(f"  Rendered {rendered_count} HTML pages")
+print(f"  Generated {redirect_count} redirect stubs for relocated paths")
 
 if unresolved_links:
-    print(f"\n  ⚠ {len(unresolved_links)} suspicious link(s) remain (still relative ../):")
+    print(f"\n  ⚠ {len(unresolved_links)} suspicious link(s) remain:")
     for section, link in unresolved_links[:20]:
         print(f"      {section}: {link}")
     if len(unresolved_links) > 20:
         print(f"      ... and {len(unresolved_links) - 20} more")
-    print("\n  These may render as broken on the website. Review and add to")
-    print("  NON_RENDERED_REPO_DIRS or RELOCATED_REPO_DIRS in build.sh if needed.")
 else:
     print("  ✓ All internal links resolved")
 PYEOF
