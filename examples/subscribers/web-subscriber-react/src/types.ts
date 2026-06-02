@@ -70,6 +70,7 @@ export interface AAEPConfirmationEvent extends AAEPEventEnvelope {
   irreversible?: boolean;
   default_decision?: AAEPDefaultDecision;
   timeout_seconds?: number;
+  [key: string]: unknown;
 }
 
 /**
@@ -83,6 +84,7 @@ export interface AAEPClarificationEvent extends AAEPEventEnvelope {
   multi_select?: boolean;
   free_form_allowed?: boolean;
   timeout_seconds?: number;
+  [key: string]: unknown;
 }
 
 export type ConnectionStatus =

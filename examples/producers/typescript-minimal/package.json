@@ -1,6 +1,6 @@
 {
-  "name": "aaep-typescript-producer",
-  "version": "1.0.0",
+  "name": "@aaep/typescript-producer",
+  "version": "1.0.1",
   "description": "AAEP producer example in TypeScript / Node.js — manual loop pattern with full safety machinery",
   "keywords": [
     "aaep",

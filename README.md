@@ -2,10 +2,12 @@
 
 > **AAEP is an open protocol that lets AI agents tell assistive technology what they are doing, in a language any screen reader, voice control, or alternative input device can understand.**
 
-[![Spec](https://img.shields.io/badge/spec-v0.1--draft-blue)](spec/SPEC.md)
+[![Spec](https://img.shields.io/badge/spec-v1.0.0-blue)](spec/SPEC.md)
 [![License: Spec CC-BY-4.0](https://img.shields.io/badge/spec-CC--BY--4.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![License: Code MIT](https://img.shields.io/badge/code-MIT-green)](LICENSE-MIT)
 [![Conformance Tests](https://github.com/Ramseyxlil/aaep/actions/workflows/conformance-tests.yml/badge.svg)](https://github.com/Ramseyxlil/aaep/actions/workflows/conformance-tests.yml)
+[![Website](https://img.shields.io/badge/website-aaep--protocol.org-blue)](https://aaep-protocol.org)
+[![PyPI](https://img.shields.io/pypi/v/aaep-conformance)](https://pypi.org/project/aaep-conformance/)
 
 ---
 
@@ -33,7 +35,7 @@ emit({
     "type": "aaep:agent.tool.invoked",
     "event_id": "evt_8a3f...",
     "session_id": "sess_2c91...",
-    "timestamp": "2026-05-24T14:22:11Z",
+    "timestamp": "2026-06-30T14:22:11Z",
     "tool": "transfer_funds",
     "description": "Transfer money between accounts",
     "summary_normal": "Initiating transfer of $500 to savings",
@@ -52,13 +54,42 @@ The user never sees the protocol. They use whatever assistive technology they no
 
 The user experiences AAEP as "AI suddenly stopped being broken."
 
+## Install
+
+The conformance test suite is on PyPI:
+
+```bash
+pip install aaep-conformance
+aaep-conformance --version
+```
+
+The minimal Python producer is on PyPI:
+
+```bash
+pip install aaep-minimal-producer
+```
+
+The TypeScript producer is on npm:
+
+```bash
+npm install aaep-typescript-producer
+```
+
+A React-based web subscriber is on npm:
+
+```bash
+npm install @aaep/web-subscriber-react
+```
+
+Additional reference packages for LangChain, Anthropic SDK, Microsoft Agent Framework, MCP bridge, OpenTelemetry bridge, and the multilingual and medical extensions are also available on PyPI; see **[examples/](examples/)**.
+
 ## Where to start
 
 **If you want to understand what AAEP is and why it exists:**
 Read **[spec/01-introduction.md](spec/01-introduction.md)**.
 
 **If you want to implement AAEP for your agent or framework:**
-Read **[guides/QUICKSTART.md](guides/QUICKSTART.md)** (10 minutes), then **[guides/IMPLEMENTERS_GUIDE.md](guides/IMPLEMENTERS_GUIDE.md)**.
+Read **[guides/QUICKSTART.md](guides/QUICKSTART.md)** (30 minutes), then **[guides/IMPLEMENTERS_GUIDE.md](guides/IMPLEMENTERS_GUIDE.md)**.
 
 **If you want to build an AAEP-aware subscriber (screen reader, voice control, accessible UI):**
 Read **[guides/SUBSCRIBERS_GUIDE.md](guides/SUBSCRIBERS_GUIDE.md)**.
@@ -80,7 +111,7 @@ aaep/
 ├── schemas/           ← JSON Schemas for every event type
 ├── guides/            ← Implementer's Guide, Subscribers' Guide, Quickstart, FAQ
 ├── conformance/       ← Conformance test suite (installable Python package)
-├── examples/          ← Demonstration producers, subscribers, bridges, extensions
+├── examples/          ← Reference producers, subscribers, bridges, extensions
 ├── tools/             ← CLI utilities for validating, capturing, replaying events
 ├── governance/        ← Project governance, contribution rules, ADOPTERS, proposals
 ├── website/           ← Source for aaep-protocol.org
@@ -105,7 +136,17 @@ For a full explanation of why each folder exists, read **[governance/GOVERNANCE.
 | **2** | Interactive | Adds confirmation, clarification, and handoff with a working reply channel and timeout semantics. |
 | **3** | Negotiated | Adds subscription handshake, backpressure, coalescing negotiation, and signed manifests. The full protocol. |
 
-A producer or subscriber that passes the conformance test suite at a given level may claim that level publicly. See **[CONFORMANCE.md](spec/09-conformance.md)** for full requirements.
+A producer or subscriber that passes the conformance test suite at a given level may claim that level publicly. See **[spec/09-conformance.md](spec/09-conformance.md)** for full requirements.
+
+## Stability and support window
+
+AAEP v1.0.0 ships with the following stability commitments:
+
+- **Backward-compatible** schema and behavioral stability throughout the v1.x series.
+- **Full support window:** June 2026 through June 2031 (5 years).
+- **Security-only maintenance:** through June 2033 (2 additional years).
+
+See **[governance/ROADMAP.md](governance/ROADMAP.md)** for the public roadmap.
 
 ## Adopters
 
@@ -113,7 +154,7 @@ A current list of organizations and projects with AAEP support lives in **[gover
 
 ## Governance
 
-AAEP was **founded by [Abdulrafiu Izuafa](https://www.linkedin.com/in/abdulrafiu-izuafa-a9a451264/), open to all contributors**. The protocol's long-term home is intended to be a W3C Community Group; this repository is the staging ground.
+AAEP was **founded by [Abdulrafiu Izuafa](https://www.linkedin.com/in/abdulrafiu-izuafa-a9a451264/), open to all contributors**. The protocol's long-term home is intended to be a foundation; this repository is the staging ground.
 
 Decisions follow the proposal process documented in **[governance/CONTRIBUTING.md](governance/CONTRIBUTING.md)**. Major changes are tracked as AAEP Change Proposals (ACPs) in **[governance/proposals/](governance/proposals/)**.
 
@@ -140,7 +181,7 @@ If you discover a security issue in the protocol or any reference implementation
 
 - **Maintainer:** Abdulrafiu Izuafa (`Abdulrafiu@izusoft.tech`)
 - **Issues and discussions:** [github.com/Ramseyxlil/aaep](https://github.com/Ramseyxlil/aaep)
-- **Website:** [aaep-protocol.org](https://aaep-protocol.org) *(coming soon)*
+- **Website:** [aaep-protocol.org](https://aaep-protocol.org)
 
 ---
 

@@ -9,6 +9,7 @@
  * and it Just Works for AT users.
  */
 
+import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAAEPEvents } from "./useAAEPEvents.js";
 import type {
@@ -51,7 +52,7 @@ interface PendingReply {
   type: "confirmation" | "clarification";
 }
 
-export function AAEPSubscriber(props: AAEPSubscriberProps): JSX.Element {
+export function AAEPSubscriber(props: AAEPSubscriberProps): React.ReactElement {
   const {
     endpoint,
     preferredLanguages = ["en"],
@@ -128,6 +129,39 @@ export function AAEPSubscriber(props: AAEPSubscriberProps): JSX.Element {
     }
   }, [pendingReply]);
 
+  const handleAccept = useCallback(async () => {
+    if (pendingReply === null || pendingReply.type !== "confirmation") return;
+    const event = pendingReply.event as AAEPConfirmationEvent;
+    setPendingReply(null);
+    setAssertiveText("Accepted.");
+    await sendReply(event.reply_token, "confirmation.reply", {
+      decision: "accept",
+    });
+  }, [pendingReply, sendReply]);
+
+  const handleReject = useCallback(async () => {
+    if (pendingReply === null || pendingReply.type !== "confirmation") return;
+    const event = pendingReply.event as AAEPConfirmationEvent;
+    setPendingReply(null);
+    setAssertiveText("Rejected.");
+    await sendReply(event.reply_token, "confirmation.reply", {
+      decision: "reject",
+    });
+  }, [pendingReply, sendReply]);
+
+  const handleClarificationOption = useCallback(
+    async (option: string) => {
+      if (pendingReply === null || pendingReply.type !== "clarification") return;
+      const event = pendingReply.event as AAEPClarificationEvent;
+      setPendingReply(null);
+      setAssertiveText(`Selected: ${option}`);
+      await sendReply(event.reply_token, "clarification.reply", {
+        response: option,
+      });
+    },
+    [pendingReply, sendReply],
+  );
+
   // Keyboard shortcuts: A = accept, R = reject (only while confirmation pending)
   useEffect(() => {
     if (pendingReply === null || pendingReply.type !== "confirmation") {
@@ -149,41 +183,7 @@ export function AAEPSubscriber(props: AAEPSubscriberProps): JSX.Element {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pendingReply]);
-
-  const handleAccept = useCallback(async () => {
-    if (pendingReply === null || pendingReply.type !== "confirmation") return;
-    const event = pendingReply.event;
-    setPendingReply(null);
-    setAssertiveText("Accepted.");
-    await sendReply(event.reply_token, "confirmation.reply", {
-      decision: "accept",
-    });
-  }, [pendingReply, sendReply]);
-
-  const handleReject = useCallback(async () => {
-    if (pendingReply === null || pendingReply.type !== "confirmation") return;
-    const event = pendingReply.event;
-    setPendingReply(null);
-    setAssertiveText("Rejected.");
-    await sendReply(event.reply_token, "confirmation.reply", {
-      decision: "reject",
-    });
-  }, [pendingReply, sendReply]);
-
-  const handleClarificationOption = useCallback(
-    async (option: string) => {
-      if (pendingReply === null || pendingReply.type !== "clarification") return;
-      const event = pendingReply.event;
-      setPendingReply(null);
-      setAssertiveText(`Selected: ${option}`);
-      await sendReply(event.reply_token, "clarification.reply", {
-        response: option,
-      });
-    },
-    [pendingReply, sendReply],
-  );
+  }, [pendingReply, handleAccept, handleReject]);
 
   const rootClasses = [
     "aaep-subscriber",
@@ -216,7 +216,7 @@ export function AAEPSubscriber(props: AAEPSubscriberProps): JSX.Element {
       {/* === Confirmation UI === */}
       {pendingReply !== null && pendingReply.type === "confirmation" && (
         <ConfirmationDialog
-          event={pendingReply.event}
+          event={pendingReply.event as AAEPConfirmationEvent}
           onAccept={handleAccept}
           onReject={handleReject}
           acceptButtonRef={acceptButtonRef}
@@ -227,7 +227,7 @@ export function AAEPSubscriber(props: AAEPSubscriberProps): JSX.Element {
       {/* === Clarification UI === */}
       {pendingReply !== null && pendingReply.type === "clarification" && (
         <ClarificationDialog
-          event={pendingReply.event}
+          event={pendingReply.event as AAEPClarificationEvent}
           onSelect={handleClarificationOption}
         />
       )}
@@ -255,9 +255,9 @@ function ConfirmationDialog({
   event: AAEPConfirmationEvent;
   onAccept: () => void;
   onReject: () => void;
-  acceptButtonRef: React.RefObject<HTMLButtonElement>;
+  acceptButtonRef: React.RefObject<HTMLButtonElement | null>;
   timeoutMs: number;
-}): JSX.Element {
+}): React.ReactElement {
   const [remaining, setRemaining] = useState<number>(
     Math.min(timeoutMs / 1000, event.timeout_seconds ?? 300),
   );
@@ -318,7 +318,7 @@ function ClarificationDialog({
 }: {
   event: AAEPClarificationEvent;
   onSelect: (option: string) => void;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <div
       className="aaep-dialog aaep-clarification"
@@ -359,7 +359,7 @@ function EventLog({
   events: AAEPEvent[];
   status: ConnectionStatus;
   onClear: () => void;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <details className="aaep-event-log">
       <summary>

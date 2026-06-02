@@ -1,6 +1,6 @@
 {
   "name": "@aaep/web-subscriber-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React component that subscribes to AAEP producers and integrates with browser ARIA live regions for screen reader accessibility",
   "license": "MIT",
   "author": "Abdulrafiu Izuafa <Abdulrafiu@izusoft.tech>",
@@ -42,7 +42,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc",
     "dev": "vite",
     "test": "vitest",
     "lint": "tsc --noEmit && eslint src --ext ts,tsx",
