@@ -265,7 +265,8 @@ for section_name, pages in section_pages.items():
 
 schemas_dir = DIST / "schemas" / "v1"
 if schemas_dir.exists():
-    schema_files = sorted(schemas_dir.rglob("*.json"))
+    # Main /schemas/v1/ index listing every schema
+    schema_files = sorted(list(schemas_dir.rglob("*.json")) + list(schemas_dir.rglob("*.jsonld")))
     items = []
     for sf in schema_files:
         rel = sf.relative_to(schemas_dir)
@@ -288,6 +289,36 @@ if schemas_dir.exists():
     )
     (schemas_dir / "index.html").write_text(output, encoding="utf-8")
     rendered_count += 1
+
+    # Per-subdirectory indexes for /schemas/v1/core/, /handshake/, /context/, etc.
+    for subdir in sorted([d for d in schemas_dir.iterdir() if d.is_dir()]):
+        sub_files = sorted(list(subdir.rglob("*.json")) + list(subdir.rglob("*.jsonld")))
+        if not sub_files:
+            continue
+        sub_name = subdir.name
+        sub_items = []
+        for sf in sub_files:
+            rel = sf.relative_to(subdir)
+            sub_items.append(f'<li><a href="/schemas/v1/{sub_name}/{rel.as_posix()}">{rel.as_posix()}</a></li>')
+        sub_items_html = "\n".join(sub_items)
+        sub_content = f"""
+<h1>JSON Schemas — {sub_name}</h1>
+<p>AAEP v1 JSON Schemas in the <code>{sub_name}</code> category. Each schema's <code>$id</code> matches its URL on this site.</p>
+<ul class="page-index">
+{sub_items_html}
+</ul>
+<p><a href="/schemas/v1/">← Back to all schemas</a></p>
+"""
+        sub_breadcrumb = f'<a href="/">Home</a> / <a href="/schemas/v1/">Schemas v1</a> / {sub_name}'
+        sub_output = (
+            template
+            .replace("{{PAGE_TITLE}}", f"Schemas v1: {sub_name}")
+            .replace("{{SECTION}}", "schemas")
+            .replace("{{BREADCRUMB}}", sub_breadcrumb)
+            .replace("{{CONTENT}}", sub_content)
+        )
+        (subdir / "index.html").write_text(sub_output, encoding="utf-8")
+        rendered_count += 1
 
 redirect_count = 0
 for src, dst in RELOCATED_REPO_DIRS.items():
