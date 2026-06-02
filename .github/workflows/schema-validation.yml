@@ -15,13 +15,13 @@ on:
     branches: [main]
     paths:
       - "schemas/**"
-      - "conformance/aaep_conformance/aaep_conformance/fixtures/**"
+      - "conformance/aaep_conformance/fixtures/**"
       - ".github/workflows/schema-validation.yml"
   pull_request:
     branches: [main]
     paths:
       - "schemas/**"
-      - "conformance/aaep_conformance/aaep_conformance/fixtures/**"
+      - "conformance/aaep_conformance/fixtures/**"
       - ".github/workflows/schema-validation.yml"
   workflow_dispatch:
 
@@ -120,7 +120,7 @@ jobs:
               if "$id" in schema:
                   schema_store[schema["$id"]] = schema
 
-          fixtures_dir = Path("conformance/aaep_conformance/aaep_conformance/fixtures")
+          fixtures_dir = Path("conformance/aaep_conformance/fixtures")
           if not fixtures_dir.is_dir():
               print("No fixtures directory; nothing to cross-validate")
               raise SystemExit(0)
@@ -157,11 +157,11 @@ jobs:
           cache: pip
 
       - name: Install conformance suite
-        working-directory: conformance/aaep_conformance
+        working-directory: conformance
         run: pip install -e .
 
       - name: Run fixture validation
-        working-directory: conformance/aaep_conformance
+        working-directory: conformance
         run: |
           python -m aaep_conformance.cli validate-fixtures \
             --fixtures-dir aaep_conformance/fixtures
