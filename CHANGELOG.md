@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Conformance claims should reference the major version (e.g., "AAEP v1 Level 2 conformant"). Implementations may also claim conformance to a specific minor version when relying on features introduced in that minor version.
 
-The process for proposing changes is documented in [governance/CONTRIBUTING.md](governance/CONTRIBUTING.md). Substantial changes follow the AAEP Change Proposal (ACP) workflow described in [governance/proposals/README.md](governance/proposals/README.md).
+The process for proposing changes is documented in [governance/CONTRIBUTING.md](governance/CONTRIBUTING.md). Substantial changes follow the AAEP Change Proposal (ACP) workflow described in [governance/proposals/template.md](governance/proposals/template.md).
 
 ---
 
@@ -38,110 +38,95 @@ Changes prepared for the next release will be listed here. When a release is cut
 
 ---
 
-## [0.1.0-draft] — 2026-05-24
+## [1.0.0] — 2026-06-30
 
-Initial public draft of the AAEP specification.
-
-This release is marked `draft` because it has not yet undergone formative review with disabled developers, has not been submitted to a standards body, and may change substantially in response to early implementer feedback. Implementations against `0.1.0-draft` should not yet be considered stable.
+First public release of the Agent Accessibility Event Protocol.
 
 ### Added
 
 #### Specification (`spec/`)
-- Initial specification document covering twelve core event types organized into four families (Lifecycle, Reasoning State, Tool and Action, Human-in-the-Loop).
-- Event envelope definition with required fields: `@context`, `type`, `event_id`, `session_id`, `timestamp`, `producer`, `verbosity`, `urgency`, `localization_hints`.
+- Twelve core event types organized into four families: Lifecycle, Reasoning State, Tool and Action, and Human-in-the-Loop.
+- Event envelope with required fields: `@context`, `type`, `event_id`, `session_id`, `timestamp`, `producer`, `verbosity`, `urgency`, `localization_hints`.
 - Subscription handshake protocol with capability negotiation.
 - Confirmation reply protocol with reply tokens and timeout semantics.
 - Extension mechanism via JSON-LD `@context` arrays and namespaced `type` URIs.
-- Conformance levels 1 (Notification), 2 (Interactive), and 3 (Negotiated).
-- Transport requirements abstraction; non-normative appendix listing SSE, WebSocket, local IPC (Windows named pipes, Unix domain sockets), and stdio JSON-RPC as conforming transports.
-- Security and threat-model section addressing producer dishonesty, information disclosure, and denial-of-service via event flood.
+- Three conformance levels: Level 1 (Notification), Level 2 (Interactive), Level 3 (Negotiated).
+- Transport-agnostic core with non-normative appendix covering SSE, WebSocket, local IPC, and stdio JSON-RPC.
+- Security threat model addressing producer dishonesty, information disclosure, and event flooding.
 - Internationalization guidance covering language declaration, locale negotiation, and Unicode handling.
 
 #### Schemas (`schemas/`)
-- JSON Schema definitions for the envelope and each of the twelve core event types.
-- JSON Schema definitions for subscription request, subscription accepted, subscription rejected, and confirmation reply messages.
+- JSON Schemas for the envelope and all twelve core event types.
+- JSON Schemas for subscription request, subscription accepted, subscription rejected, confirmation reply, and clarification reply messages.
 - Canonical JSON-LD context document at `schemas/context/aaep-v1.jsonld`.
 
-#### Guides (`guides/`)
-- Implementer's Guide covering integration patterns for middleware-based, callback-based, decorator-based, event-emitter-based, and manual-loop agent frameworks.
-- Subscribers' Guide for assistive technology vendors.
-- Extensions Guide explaining how to design and publish AAEP extensions.
-- Quickstart tutorial demonstrating a minimal AAEP integration in under ten minutes.
-- FAQ addressing common misconceptions about AAEP being a library, service, or vendor-specific tool.
-
-#### Conformance test suite (`conformance/`)
+#### Conformance suite (`conformance/`)
 - Installable Python package `aaep-conformance`.
-- Test batteries for envelope validation, event schema validation, subscription handshake, confirmation flow, backpressure, and extension handling.
-- Level-1, Level-2, and Level-3 test suites with selectable execution.
-- Machine-readable conformance reports.
+- Level 1, Level 2, and Level 3 test suites.
+- 29 self-tests covering envelope, lifecycle, tools, streaming, confirmation, handshake, safety, and reporter logic.
+- Machine-readable conformance reports in JSON and HTML formats.
 
-#### Reference examples (`examples/`)
-- Minimal Python producer with no framework dependency.
-- Python LangChain integration via `BaseCallbackHandler`.
-- Python Anthropic SDK wrapper demonstrating Claude integration.
-- Python Microsoft Agent Framework integration via middleware.
-- Minimal TypeScript producer.
-- Minimal C# producer.
-- Minimal Go producer.
-- Minimal Rust producer.
-- CLI debug subscriber.
-- NVDA add-on prototype subscriber.
-- React component subscriber for accessible web UIs.
-- Narrator bridge prototype.
-- Model Context Protocol (MCP) to AAEP bridge.
-- OpenTelemetry to AAEP bridge.
-- Multilingual African languages extension example (Yoruba, Hausa, Igbo).
-- Medical HIPAA extension example.
+#### Reference implementations (`examples/`)
+- **Producers:** Python minimal, Python LangChain integration, Python Anthropic SDK integration, Python Microsoft Agent Framework integration, TypeScript minimal.
+- **Subscribers:** CLI debug, NVDA add-on prototype, web subscriber (React), Narrator bridge prototype.
+- **Bridges:** Model Context Protocol (MCP) to AAEP, OpenTelemetry to AAEP.
+- **Extensions:** Multilingual African languages (Yoruba, Hausa, Igbo), Medical HIPAA-aware extension.
 
 #### Tools (`tools/`)
 - `aaep-validate`: validates a single event against its schema.
-- `aaep-capture`: captures a live AAEP event stream for debugging.
-- `aaep-replay`: replays captured event streams for testing subscribers.
+- `aaep-capture`: captures a live AAEP event stream.
+- `aaep-replay`: replays captured streams against subscribers.
+
+#### Guides (`guides/`)
+- Implementer's Guide with five integration patterns: middleware-based, callback-based, decorator-based, event-emitter-based, and manual-loop.
+- Subscribers' Guide for assistive technology vendors.
+- Extensions Guide for designing and publishing AAEP extensions.
+- Quickstart tutorial.
+- FAQ.
 
 #### Governance (`governance/`)
-- Governance document defining decision-making process, maintainer roles, and W3C Community Group transition plan.
+- Governance document defining decision-making process, maintainer roles, and foundation transition criteria.
 - Contribution guide with AAEP Change Proposal (ACP) workflow.
-- Code of conduct based on Contributor Covenant 2.1.
-- Security disclosure policy.
-- Maintainers list.
-- Extensions registry.
-- Initial adopters list (empty at first publication; populated as adopters self-register).
-- Roadmap document covering 18-month plan to W3C Community Group submission.
-- Initial AAEP Change Proposals:
-  - ACP-0001: Initial specification (this release).
-  - ACP-0002: Multilingual extension framework.
+- Code of Conduct based on Contributor Covenant 2.1.
+- Security disclosure policy with 90-day coordinated disclosure timeline.
+- Maintainers list, extensions registry, adopters list, roadmap, trademark policy.
+- ACP-0001 (Protocol Launch) and ACP-0002 (Multilingual Extension), plus the ACP template.
 
 #### Repository infrastructure
-- README.md, LICENSE (split-license notice), LICENSE-CC-BY-4.0, LICENSE-MIT, NOTICE.
-- CITATION.cff for academic citation.
+- `README.md`, `LICENSE` (split-license notice), `LICENSE-MIT`, `LICENSE-CC-BY-4.0`, `NOTICE`.
+- `CITATION.cff` for academic citation.
 - `.gitignore` and `.editorconfig`.
-- GitHub Actions workflows for conformance tests, schema validation, spec build, examples build, and website publication.
-- Issue templates for bug reports, spec clarifications, extension proposals, and adopter registration.
-- Pull request template.
-- CODEOWNERS file routing reviews to appropriate maintainers.
-- Dependabot configuration.
+- GitHub Actions workflows: conformance tests, schema validation, spec build, website publication.
+- Issue templates for bug reports, feature requests, and spec clarifications.
+- Pull request template with mandatory accessibility implications section.
+- `CODEOWNERS`, `dependabot.yml`, `FUNDING.yml`.
 
-### Known limitations of `0.1.0-draft`
+#### Website (`website/`)
+- Source for `https://aaep-protocol.org`.
+- Landing page, 404 page, accessibility-first stylesheet.
+- Build script that renders spec, guides, and governance from markdown to HTML.
+- Canonical schema URLs hosted at `https://aaep-protocol.org/schemas/v1/`.
 
-The following are acknowledged gaps that will be addressed before `1.0.0`:
+### Stability commitments
 
-- Formative review with disabled developers has not yet been conducted. Findings from that review will inform the `0.2.0` revision.
-- Signed manifest support (required for Level 3 conformance) is specified but not yet implemented in reference examples.
-- No assistive technology vendor has shipped production AAEP support at the time of this release. NVDA, JAWS, Narrator, VoiceOver, and TalkBack integration is planned but unvalidated.
-- The W3C Community Group proposal has not yet been submitted.
-- Cross-language conformance has been verified for Python and TypeScript examples but not yet for C#, Go, or Rust examples.
+- Backward-compatible schema and behavioral stability throughout the v1.x series.
+- Full support window: June 2026 through June 2031 (5 years).
+- Security-only maintenance: through June 2033 (2 additional years).
 
-These items appear on the public roadmap in [governance/ROADMAP.md](governance/ROADMAP.md).
+### Known limitations of v1.0.0
+
+- No production assistive technology integration ships with this release. NVDA, JAWS, Narrator, VoiceOver, and TalkBack support is on the v1.x roadmap.
+- No external organizations are listed as production adopters at launch (per the empty-by-design `ADOPTERS.md`).
+- The foundation transition has not yet begun; the protocol is governed during a bootstrap period per `GOVERNANCE.md`.
 
 ---
 
 ## Version history summary
 
-| Version | Date | Status |
-|---|---|---|
-| 0.1.0-draft | 2026-05-24 | Initial public draft |
+| Version | Date       | Status                |
+|---------|------------|-----------------------|
+| 1.0.0   | 2026-06-30 | Initial public release |
 
 ---
 
-[Unreleased]: https://github.com/Ramseyxlil/aaep/compare/v0.1.0-draft...HEAD
-[0.1.0-draft]: https://github.com/Ramseyxlil/aaep/releases/tag/v0.1.0-draft
+[1.0.0]: https://github.com/Ramseyxlil/aaep/releases/tag/v1.0.0
