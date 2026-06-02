@@ -64,6 +64,7 @@ TEMPLATE_PATH = ROOT / "website" / "src" / "_template.html"
 GITHUB_REPO_BASE = "https://github.com/Ramseyxlil/aaep/tree/main/"
 GITHUB_BLOB_BASE = "https://github.com/Ramseyxlil/aaep/blob/main/"
 
+# Dirs that exist in the repo but are NOT rendered to HTML on the site.
 NON_RENDERED_REPO_DIRS = [
     "examples",
     "conformance",
@@ -71,11 +72,28 @@ NON_RENDERED_REPO_DIRS = [
     ".github",
 ]
 
+# Files at the repo root that aren't rendered to HTML.
+NON_RENDERED_REPO_FILES = [
+    "README.md", "README.html",
+    "CHANGELOG.md", "CHANGELOG.html",
+    "LICENSE", "LICENSE.md",
+    "LICENSE-MIT", "LICENSE-MIT.md",
+    "LICENSE-CC-BY-4.0", "LICENSE-CC-BY-4.0.md",
+    "NOTICE", "NOTICE.md",
+    "CITATION.cff",
+    "DEPLOYMENT.md", "DEPLOYMENT.html",
+]
+
+# Dirs in the source tree that are rendered to HTML, but at a different path.
 RELOCATED_REPO_DIRS = {
     "schemas/core": "/schemas/v1/core",
     "schemas/handshake": "/schemas/v1/handshake",
     "schemas/context": "/schemas/v1/context",
+    "schemas": "/schemas/v1",
 }
+
+# Cross-section dirs that ARE rendered. ../guides/X.html should be /guides/X.html
+RENDERED_SECTIONS = {"spec", "guides", "governance"}
 
 template = TEMPLATE_PATH.read_text(encoding="utf-8")
 
@@ -105,6 +123,7 @@ def file_title(path: Path) -> str:
 unresolved_links = []
 
 def rewrite_links(html: str, source_section: str) -> str:
+    # Pass A: relative paths to non-rendered dirs → GitHub URLs.
     def replace_non_rendered(match):
         href = match.group(1)
         stripped = re.sub(r"^(\.\./)+", "", href)
@@ -120,12 +139,13 @@ def rewrite_links(html: str, source_section: str) -> str:
         replace_non_rendered, html,
     )
 
+    # Pass B: relocated dirs (schemas/core/* → /schemas/v1/core/*)
     def replace_relocated(match):
         href = match.group(1)
         stripped = re.sub(r"^(\.\./)+", "", href)
         for src, dst in sorted(RELOCATED_REPO_DIRS.items(), key=lambda kv: -len(kv[0])):
             if stripped == src:
-                return f'href="{dst}"'
+                return f'href="{dst}/"'
             if stripped.startswith(src + "/"):
                 tail = stripped[len(src):]
                 return f'href="{dst}{tail}"'
@@ -139,6 +159,40 @@ def rewrite_links(html: str, source_section: str) -> str:
         )
         html = re.sub(relocated_pattern, replace_relocated, html)
 
+    # Pass C: cross-section paths → absolute site URLs.
+    # ../guides/X.html → /guides/X.html (works from any depth)
+    def replace_cross_section(match):
+        href = match.group(1)
+        stripped = re.sub(r"^(\.\./)+", "", href)
+        for section in RENDERED_SECTIONS:
+            if stripped == section or stripped.startswith(section + "/"):
+                return f'href="/{stripped}"'
+        return match.group(0)
+
+    html = re.sub(
+        r'href="((?:\.\./)+(?:' + "|".join(RENDERED_SECTIONS) + r')[^"]*)"',
+        replace_cross_section, html,
+    )
+
+    # Pass D: relative paths to non-rendered root files (README, CHANGELOG, etc.)
+    def replace_root_file(match):
+        href = match.group(1)
+        stripped = re.sub(r"^(\.\./)+", "", href)
+        # Strip anchors and query
+        base = re.split(r'[#?]', stripped)[0]
+        # README.html → README.md on GitHub
+        github_path = base.replace(".html", ".md") if base.endswith(".html") else base
+        if base in NON_RENDERED_REPO_FILES or github_path in NON_RENDERED_REPO_FILES:
+            # Send to GitHub for the markdown source
+            return f'href="{GITHUB_BLOB_BASE}{github_path}"'
+        return match.group(0)
+
+    html = re.sub(
+        r'href="((?:\.\./)+(?:README|CHANGELOG|LICENSE|NOTICE|CITATION|DEPLOYMENT)[^"]*)"',
+        replace_root_file, html,
+    )
+
+    # Pass E: .md → .html (relative + absolute aaep-protocol.org)
     html = re.sub(
         r'href="((?!https?://|mailto:|#)[^"]*?)\.md(#[^"]*)?"',
         lambda m: f'href="{m.group(1)}.html{m.group(2) or ""}"',
@@ -150,6 +204,7 @@ def rewrite_links(html: str, source_section: str) -> str:
         html,
     )
 
+    # Pass F: track anything that's STILL relative
     suspicious = re.findall(r'href="((?:\.\./)+[^"]+)"', html)
     for s in suspicious:
         unresolved_links.append((source_section, s))
@@ -248,14 +303,12 @@ if schemas_dir.exists():
     (schemas_dir / "index.html").write_text(output, encoding="utf-8")
     rendered_count += 1
 
-# Generate redirect stubs (meta-refresh) for relocated paths so
-# typing the old URL directly redirects to the new one.
-# GitHub Pages doesn't support server-side 301s, so this is the best we can do.
+# Redirect stubs for the relocated dirs (typed URL → working URL).
 redirect_count = 0
 for src, dst in RELOCATED_REPO_DIRS.items():
     src_dir = DIST / src
     if (src_dir / "index.html").exists():
-        continue  # Don't overwrite real content
+        continue
     src_dir.mkdir(parents=True, exist_ok=True)
     stub = f"""<!DOCTYPE html>
 <html lang="en">
@@ -273,7 +326,7 @@ for src, dst in RELOCATED_REPO_DIRS.items():
     redirect_count += 1
 
 print(f"  Rendered {rendered_count} HTML pages")
-print(f"  Generated {redirect_count} redirect stubs for relocated paths")
+print(f"  Generated {redirect_count} redirect stubs")
 
 if unresolved_links:
     print(f"\n  ⚠ {len(unresolved_links)} suspicious link(s) remain:")
