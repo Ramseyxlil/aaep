@@ -1,0 +1,31 @@
+# AAEP Funding Configuration
+#
+# AAEP does not currently solicit donations. The project is funded by the
+# contribution time of its volunteer maintainers and by adopters who pay
+# their own engineers to integrate.
+#
+# As the project matures and a foundation transition occurs (see
+# governance/GOVERNANCE.md §9), formal funding channels may be established.
+# At that time, this file will be updated to point to the foundation's
+# donation infrastructure.
+#
+# In the meantime, the most valuable contributions are:
+# - Adopting AAEP and reporting back on what worked and what didn't
+# - Contributing translations, reference implementations, or bug fixes
+# - Sharing AAEP with disability-community organizations and AT vendors
+# - Sponsoring travel for community members to relevant conferences
+
+# Currently, no platforms are configured.
+# When ready, populate one or more of the following:
+#
+# github: []           # GitHub Sponsors usernames
+# patreon:             # Patreon username
+# open_collective:     # Open Collective slug
+# ko_fi:               # Ko-fi username
+# tidelift:            # Tidelift platform-name/package-name
+# community_bridge:    # Community Bridge project
+# liberapay:           # Liberapay username
+# issuehunt:           # IssueHunt username
+# otechie:             # Otechie username
+# lfx_crowdfunding:    # LFX Crowdfunding project slug
+# custom: []           # List of custom URLs

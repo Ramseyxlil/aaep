@@ -1,0 +1,16 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.output.streaming",
+  "event_id": "evt_secondcomp001",
+  "session_id": "sess_dupstreamtest",
+  "timestamp": "2026-06-30T14:22:30.012Z",
+  "producer": {
+    "agent_id": "buggy-streamer"
+  },
+  "urgency": "normal",
+  "chunk": "This is the second completion event for the same output_id, which is invalid.",
+  "position": 200,
+  "complete": true,
+  "coalesce_hint": "completion",
+  "output_id": "out_alreadydone"
+}

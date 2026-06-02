@@ -1,0 +1,44 @@
+# AAEP CODEOWNERS
+#
+# This file defines who automatically gets review requests for changes in
+# specific parts of the repository. See:
+# https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Bootstrap period: a single Maintainer reviews everything. As more
+# Maintainers join (per GOVERNANCE.md §2.6), this file will route reviews
+# to subject-matter owners.
+#
+# Format: <path pattern>  @owner1 @owner2 ...
+
+# Global default — every PR gets this reviewer if no more-specific rule matches
+*                                       @Ramseyxlil
+
+# Specification — highest review bar; affects every implementation
+/spec/                                  @Ramseyxlil
+/schemas/                               @Ramseyxlil
+
+# Conformance suite — changes here change what "conformant" means
+/conformance/                     @Ramseyxlil
+
+# Governance — changes affect community structure
+/governance/                            @Ramseyxlil
+/governance/proposals/                  @Ramseyxlil
+
+# Security policy — handled by the security team only
+/SECURITY.md                            @Ramseyxlil
+/governance/SECURITY.md                 @Ramseyxlil
+
+# Reference implementations — owned by implementation maintainers
+/examples/producers/                    @Ramseyxlil
+/examples/subscribers/                  @Ramseyxlil
+/examples/bridges/                      @Ramseyxlil
+/examples/extensions/                   @Ramseyxlil
+
+# Tooling
+/tools/                                 @Ramseyxlil
+
+# Website
+/website/                               @Ramseyxlil
+
+# CI infrastructure
+/.github/                               @Ramseyxlil

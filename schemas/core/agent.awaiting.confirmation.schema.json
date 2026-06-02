@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.awaiting.confirmation.schema.json",
+  "title": "AAEP Event: agent.awaiting.confirmation",
+  "description": "Pauses the producer pending explicit user consent for a specific action. MUST be emitted before any irreversible action. The producer MUST block its own progress (no execution of the confirmed action) until a valid reply arrives or timeout_seconds elapses, at which point the producer MUST apply default_decision. For irreversible high-risk and medium-risk actions, default_decision MUST be 'reject' (enforced by this schema). MUST be emitted with urgency='critical'. Defined normatively in Chapter 4 §4.4.1 and Chapter 6 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" },
+    {
+      "description": "Safety constraint: irreversible actions with high or medium risk MUST default to reject (Chapter 6 §6.4.1).",
+      "if": {
+        "properties": {
+          "irreversible": { "const": true },
+          "risk_level": { "enum": ["high", "medium"] }
+        },
+        "required": ["irreversible", "risk_level"]
+      },
+      "then": {
+        "properties": {
+          "default_decision": { "const": "reject" }
+        }
+      }
+    }
+  ],
+
+  "type": "object",
+  "required": [
+    "type",
+    "action",
+    "consequence",
+    "reply_token",
+    "timeout_seconds",
+    "default_decision"
+  ],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.awaiting.confirmation'.",
+      "const": "aaep:agent.awaiting.confirmation"
+    },
+    "urgency": {
+      "description": "MUST be 'critical'. Subscribers MUST announce confirmation events with appropriate prominence and MUST NOT suppress them under backpressure.",
+      "const": "critical"
+    },
+    "action": {
+      "description": "Human-readable description of the action awaiting confirmation. Example: 'Transfer $500 from checking-7821 to savings-3344.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "consequence": {
+      "description": "Human-readable description of what happens if the action proceeds. Example: 'Funds move immediately. Reversal requires bank intervention.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "reply_token": {
+      "description": "Opaque correlation token. MUST be echoed by the subscriber in the matching confirmation.reply message. Single-use; once consumed, the producer rejects subsequent replies with this token. NOT a security credential (see Chapter 6 §6.2.4).",
+      "type": "string",
+      "pattern": "^rpl_[A-Za-z0-9]{1,64}$"
+    },
+    "timeout_seconds": {
+      "description": "Seconds after which the producer applies default_decision. Recommended ranges by action type are in Chapter 6 §6.4.2 (180-600s for high-risk, 60-180s for medium-risk, 30-90s for low-risk).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400
+    },
+    "default_decision": {
+      "description": "Applied if no reply arrives before timeout. For irreversible high-risk and medium-risk actions, MUST be 'reject' (enforced by this schema).",
+      "type": "string",
+      "enum": ["accept", "reject"]
+    },
+    "summary_terse": {
+      "description": "Short form. Example: 'Confirm transfer?'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Standard form combining action and consequence. Example: 'Confirmation required. Transfer $500 from checking to savings. Cannot be easily reversed.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed form, e.g., listing affected resources or audit information.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "risk_level": {
+      "description": "Producer's classification of this action's risk. Influences subscriber prominence and default_decision rules.",
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "irreversible": {
+      "description": "Whether the action is irreversible. Combined with risk_level, determines the required default_decision (see §6.4.1).",
+      "type": "boolean"
+    },
+    "reversibility": {
+      "description": "More nuanced reversibility classification. May be present alongside or instead of irreversible.",
+      "type": "string",
+      "enum": ["reversible", "reversible_with_effort", "irreversible"]
+    },
+    "allowed_replies": {
+      "description": "Permitted decision values. Defaults to ['accept', 'reject']. Custom values require extensions.",
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "default": ["accept", "reject"]
+    },
+    "extra_context": {
+      "description": "Additional structured context the subscriber may surface, such as affected account numbers, amount in alternative currencies, or audit trail identifiers.",
+      "type": "object"
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.confirmation",
+      "event_id": "evt_b7c4e9a2f5d1a8c3",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:20.014Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "action": "Transfer $500.00 from checking-7821 to savings-3344.",
+      "consequence": "Funds move immediately. Reversal requires bank intervention and takes 3 to 5 business days.",
+      "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+      "timeout_seconds": 300,
+      "default_decision": "reject",
+      "risk_level": "high",
+      "irreversible": true,
+      "reversibility": "reversible_with_effort",
+      "summary_terse": "Confirm transfer?",
+      "summary_normal": "Confirmation required. Transfer $500 from checking to savings. Cannot be easily reversed."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.confirmation",
+      "event_id": "evt_b7c4e9a2f5d1a8c4",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T14:30:15.421Z",
+      "producer": {
+        "agent_id": "email-assistant",
+        "agent_version": "2.0.0"
+      },
+      "urgency": "critical",
+      "action": "Save draft to your Drafts folder.",
+      "consequence": "Draft saved locally. You can edit or delete it later.",
+      "reply_token": "rpl_8d2c9f4e1a7b3a5d",
+      "timeout_seconds": 60,
+      "default_decision": "accept",
+      "risk_level": "low",
+      "irreversible": false,
+      "summary_normal": "Save email as draft?"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.confirmation",
+      "event_id": "evt_b7c4e9a2f5d1a8c5",
+      "session_id": "sess_2c91a7b4d23f1e90",
+      "timestamp": "2026-05-24T15:01:42.218Z",
+      "producer": {
+        "agent_id": "clinical-assistant",
+        "agent_version": "2.1.0"
+      },
+      "urgency": "critical",
+      "action": "Update patient record with new medication allergy: penicillin.",
+      "consequence": "Allergy added permanently to patient record 78921. Audit trail logged.",
+      "reply_token": "rpl_2c8e4a9f7b1d3a6e",
+      "timeout_seconds": 600,
+      "default_decision": "reject",
+      "risk_level": "high",
+      "irreversible": true,
+      "summary_normal": "Confirm adding penicillin allergy to Patient 78921's record?",
+      "extra_context": {
+        "patient_id": "78921",
+        "audit_trail_id": "audit_9c4a2b1e7d3f"
+      }
+    }
+  ]
+}

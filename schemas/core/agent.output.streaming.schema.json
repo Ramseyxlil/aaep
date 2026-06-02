@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.output.streaming.schema.json",
+  "title": "AAEP Event: agent.output.streaming",
+  "description": "Carries a chunk of user-facing output produced by the agent. This is the most-emitted event type and the one most subject to backpressure and coalescing rules. For each distinct output_id, exactly one event with complete=true MUST be emitted; chunks after the completion event are non-conforming. The position field MUST increase monotonically across chunks of the same output_id. Defined normatively in Chapter 4 §4.3.3 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "chunk", "position", "complete"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.output.streaming'.",
+      "const": "aaep:agent.output.streaming"
+    },
+    "chunk": {
+      "description": "The current chunk of output content. May be empty string for a completion-only event (e.g., signaling end-of-stream without additional content).",
+      "type": "string",
+      "maxLength": 16384
+    },
+    "position": {
+      "description": "Zero-based character offset within the current output_id (or within the session's total output if no output_id is provided). Position MUST increase monotonically across chunks of the same output_id.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "complete": {
+      "description": "true if this is the final chunk of this output; false otherwise. Each output_id has exactly one event with complete=true.",
+      "type": "boolean"
+    },
+    "coalesce_hint": {
+      "description": "Tells subscribers when this chunk should be announced. 'none' = no natural boundary, hold for next; 'word' = end of word; 'sentence' = end of sentence; 'paragraph' = end of paragraph; 'completion' = final chunk of this output.",
+      "type": "string",
+      "enum": ["none", "word", "sentence", "paragraph", "completion"]
+    },
+    "output_id": {
+      "description": "Identifier grouping chunks of the same logical output. Useful when a session produces multiple outputs (e.g., a draft email followed by a confirmation message). If absent, all streaming chunks of the session belong to a single implicit output.",
+      "type": "string",
+      "pattern": "^out_[A-Za-z0-9]{1,64}$",
+      "examples": [
+        "out_3a8c2",
+        "out_3a8c2b4d1e7f9a5c"
+      ]
+    },
+    "content_type": {
+      "description": "MIME type of the chunk content. Defaults to 'text/plain' when absent. Subscribers MAY render text/markdown, text/html, or other types differently from plain text.",
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9.+_-]*/[a-zA-Z][a-zA-Z0-9.+_-]*$",
+      "default": "text/plain",
+      "examples": [
+        "text/plain",
+        "text/markdown",
+        "text/html",
+        "application/json"
+      ]
+    },
+    "language": {
+      "description": "BCP 47 language code overriding the envelope's localization_hints.primary_language for this specific chunk. Useful for genuinely multilingual content emitted within a single session.",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$",
+      "examples": [
+        "en-US",
+        "fr-FR",
+        "yo-NG",
+        "ar-SA"
+      ]
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.output.streaming",
+      "event_id": "evt_5d9c2a7f1b4e8a3c",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:23.140Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "chunk": "Your retirement plan should target a monthly contribution of $1,200.",
+      "position": 0,
+      "complete": false
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.output.streaming",
+      "event_id": "evt_5d9c2a7f1b4e8a3c",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:23.140Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "chunk": "Your retirement plan should target a monthly contribution of $1,200 to maximize your tax-advantaged accounts.",
+      "position": 348,
+      "complete": false,
+      "coalesce_hint": "sentence",
+      "output_id": "out_3a8c2",
+      "content_type": "text/plain"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.output.streaming",
+      "event_id": "evt_8a4f2c9d1e7b5f3a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:25.812Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "chunk": "Please review and let me know if you would like adjustments.",
+      "position": 587,
+      "complete": true,
+      "coalesce_hint": "completion",
+      "output_id": "out_3a8c2",
+      "content_type": "text/plain"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.output.streaming",
+      "event_id": "evt_4c7a1f9d3b5e2a8c",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T14:25:11.342Z",
+      "producer": {
+        "agent_id": "multilingual-tutor",
+        "agent_version": "1.0.0"
+      },
+      "urgency": "normal",
+      "chunk": "Ẹ ku àárọ̀. Ṣé o sun re?",
+      "position": 0,
+      "complete": false,
+      "coalesce_hint": "sentence",
+      "language": "yo-NG"
+    }
+  ]
+}

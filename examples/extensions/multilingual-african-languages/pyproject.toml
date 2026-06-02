@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aaep-ext-african-languages"
+version = "1.0.0"
+description = "Multilingual African Languages Extension for AAEP — first-class Yoruba, Hausa, Igbo support"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Abdulrafiu Izuafa", email = "Abdulrafiu@izusoft.tech" },
+]
+keywords = [
+    "aaep",
+    "accessibility",
+    "internationalization",
+    "i18n",
+    "yoruba",
+    "hausa",
+    "igbo",
+    "african-languages",
+    "translation",
+    "extension",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Internationalization",
+    "Topic :: Software Development :: Localization",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+]
+
+dependencies = [
+    "aaep-minimal-producer>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.3.0",
+    "jsonschema>=4.20.0",
+]
+
+[project.urls]
+Homepage = "https://aaep-protocol.org/extensions/african-languages/"
+Repository = "https://github.com/Ramseyxlil/aaep"
+"Bug Tracker" = "https://github.com/Ramseyxlil/aaep/issues"
+"Translation Contributions" = "https://github.com/Ramseyxlil/aaep/blob/main/governance/CONTRIBUTING.md#71-translation-contributions"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aaep_ext_african_languages*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+aaep_ext_african_languages = ["../translations/*.json", "../extension.json"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-v", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]

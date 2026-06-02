@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/handshake/subscription.accepted.schema.json",
+  "title": "AAEP Message: subscription.accepted",
+  "description": "Producer's positive response to a subscription.request. Carries the producer-generated subscription_id, producer identity, and honored_capabilities. The honored_capabilities MUST NOT be more permissive than the subscriber's request (Chapter 5 \u00a75.4.4). Defined normatively in Chapter 5 \u00a75.4 of the AAEP specification.",
+  "type": "object",
+  "required": [
+    "type",
+    "subscription_id",
+    "aaep_version",
+    "producer",
+    "honored_capabilities"
+  ],
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'subscription.accepted'.",
+      "const": "subscription.accepted"
+    },
+    "subscription_id": {
+      "description": "Producer-generated identifier for this subscription. Stable for the lifetime of the subscription. Used by the subscriber on subsequent messages (renegotiate, close, reply).",
+      "type": "string",
+      "pattern": "^sub_[A-Za-z0-9]{1,64}$",
+      "examples": [
+        "sub_8a4f2c9d",
+        "sub_8a4f2c9d1e7b5f3a8a4f2c9d1e7b5f3a"
+      ]
+    },
+    "aaep_version": {
+      "description": "The AAEP version the producer will use on this subscription. MAY be lower than the version the subscriber requested (negotiated down) but MUST be a version both parties support.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$"
+    },
+    "producer": {
+      "description": "Producer identity. Same structure as the envelope's producer field.",
+      "type": "object",
+      "required": [
+        "agent_id"
+      ],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_version": {
+          "type": "string"
+        },
+        "agent_name": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "manifest_uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "honored_capabilities": {
+      "description": "Capabilities the producer commits to honor on this subscription. MUST NOT be more permissive than the subscriber's requested capabilities. May be less permissive if the producer cannot meet the request (e.g., honor 2 events/sec when 3 was requested).",
+      "type": "object",
+      "properties": {
+        "max_events_per_second": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "preferred_verbosity": {
+          "type": "string",
+          "enum": [
+            "terse",
+            "normal",
+            "detailed"
+          ]
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "supports_confirmation_reply": {
+          "type": "boolean"
+        },
+        "supports_clarification_reply": {
+          "type": "boolean"
+        },
+        "coalesce_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "none",
+              "word",
+              "sentence",
+              "paragraph",
+              "completion"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "event_filters": {
+          "type": "object",
+          "properties": {
+            "include": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "uniqueItems": true
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "supported_conformance_levels": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "supported_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "cognitive_load": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "pace_wpm": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 1000
+        },
+        "accept_signed_manifests_only": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": {
+        "description": "Extension-namespaced honored capabilities.",
+        "type": "object"
+      }
+    },
+    "manifest_uri": {
+      "description": "URI to the producer's full manifest document. Subscribers MAY fetch and verify the manifest.",
+      "type": "string",
+      "format": "uri"
+    },
+    "signed_manifest": {
+      "description": "Inline signed manifest as JWS compact serialization (header.payload.signature). Required when the subscriber declared accept_signed_manifests_only=true. See Chapter 10 \u00a710.4.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+    },
+    "negotiation_notes": {
+      "description": "Human-readable description of any deviations from the requested capabilities. Useful for diagnostics. Example: 'Rate negotiated down from 5 to 3 events/sec due to producer load.'",
+      "type": "string",
+      "maxLength": 4096
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "type": "subscription.accepted",
+      "subscription_id": "sub_8a4f2c9d",
+      "aaep_version": "1.0.0",
+      "producer": {
+        "agent_id": "retirement-planner"
+      },
+      "honored_capabilities": {}
+    },
+    {
+      "type": "subscription.accepted",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "aaep_version": "1.0.0",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2",
+        "agent_name": "Retirement Planning Assistant"
+      },
+      "honored_capabilities": {
+        "max_events_per_second": 3,
+        "preferred_verbosity": "normal",
+        "languages": [
+          "en-US"
+        ],
+        "supports_confirmation_reply": true,
+        "supports_clarification_reply": true,
+        "coalesce_boundaries": [
+          "sentence",
+          "completion"
+        ],
+        "supported_conformance_levels": [
+          1,
+          2
+        ]
+      },
+      "manifest_uri": "https://example.com/.well-known/aaep-manifest.json"
+    },
+    {
+      "type": "subscription.accepted",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a8a4f2c9d1e7b5f3a",
+      "aaep_version": "1.0.0",
+      "producer": {
+        "agent_id": "clinical-assistant",
+        "agent_version": "2.1.0",
+        "agent_name": "Clinical Decision Support Assistant",
+        "model": "claude-opus-4-7",
+        "manifest_uri": "https://hospital.example/.well-known/aaep-manifest.json"
+      },
+      "honored_capabilities": {
+        "max_events_per_second": 2,
+        "preferred_verbosity": "detailed",
+        "languages": [
+          "en-US",
+          "es-419"
+        ],
+        "supports_confirmation_reply": true,
+        "coalesce_boundaries": [
+          "sentence",
+          "paragraph",
+          "completion"
+        ],
+        "supported_conformance_levels": [
+          1,
+          2,
+          3
+        ]
+      },
+      "manifest_uri": "https://hospital.example/.well-known/aaep-manifest.json",
+      "signed_manifest": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJob3NwaXRhbC5leGFtcGxlIiwiYWdlbnRfaWQiOiJjbGluaWNhbC1hc3Npc3RhbnQifQ.MEUCIQDgKj8aBcD2eFgH3iJkL4mN5oPqRsTuVwXyZ_aBcDeFgWIgY_zAbCdEfGhIjKlMnOpQrStUvWxYz9_AbCdEfGhI",
+      "negotiation_notes": "Rate negotiated down from 5 to 2 events/sec due to clinical environment load."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+# Publish website workflow.
+#
+# Deploys the built website to GitHub Pages on every push to main.
+# Uses GitHub's official Pages deployment action so we get HTTPS, custom
+# domain, and audit logging without managing tokens or gh-pages branches.
+#
+# Triggers only on push to main — not on PRs, not on schedule. Each
+# deployment must come from a merge commit reviewed in the normal flow.
+
+name: Publish Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "spec/**"
+      - "guides/**"
+      - "governance/**"
+      - "schemas/**"
+      - "website/**"
+      - ".github/workflows/publish-website.yml"
+  # Allow manual re-deploys (e.g. after CNAME or DNS changes)
+  workflow_dispatch:
+
+# Only one publish at a time; queue subsequent pushes
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+
+  build:
+    name: Build for Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install markdown
+
+      - name: Build website
+        working-directory: website
+        run: ./build.sh --clean
+
+      - name: Verify CNAME is correct
+        run: |
+          expected="aaep-protocol.org"
+          actual=$(cat website/dist/CNAME)
+          if [[ "$actual" != "$expected" ]]; then
+            echo "::error::CNAME mismatch: expected $expected, got $actual"
+            exit 1
+          fi
+          echo "  ✓ CNAME contains $expected"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  notify:
+    name: Notify on failure
+    needs: [build, deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post failure summary
+        run: |
+          {
+            echo "## ❌ Website deploy FAILED"
+            echo ""
+            echo "Commit: ${{ github.sha }}"
+            echo "Triggered by: @${{ github.actor }}"
+            echo ""
+            echo "**aaep-protocol.org may now be stale.** Investigate immediately."
+            echo ""
+            echo "Check:"
+            echo "1. Build logs (workflow run above)"
+            echo "2. GitHub Pages settings: https://github.com/${{ github.repository }}/settings/pages"
+            echo "3. DNS for aaep-protocol.org"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/handshake/confirmation.reply.schema.json",
+  "title": "AAEP Message: confirmation.reply",
+  "description": "Subscriber's reply to an agent.awaiting.confirmation event. Conveys the user's decision (accept or reject). MUST include the exact reply_token from the originating confirmation event. Replies are single-use: the producer marks the reply_token as consumed upon first valid reply and ignores subsequent replies with the same token. Defined normatively in Chapter 6 §6.3 of the AAEP specification.",
+
+  "type": "object",
+  "required": ["type", "reply_token", "decision", "subscription_id", "timestamp"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'confirmation.reply'.",
+      "const": "confirmation.reply"
+    },
+    "reply_token": {
+      "description": "The exact reply_token from the originating agent.awaiting.confirmation event. Subscribers MUST echo this token verbatim; they MUST NOT parse, interpret, or modify it.",
+      "type": "string",
+      "pattern": "^rpl_[A-Za-z0-9]{1,64}$"
+    },
+    "decision": {
+      "description": "The user's decision. Custom decisions require extension-defined values in the originating event's allowed_replies field.",
+      "type": "string",
+      "enum": ["accept", "reject"]
+    },
+    "subscription_id": {
+      "description": "The subscription on which this reply is sent. MUST match an active subscription with the producer.",
+      "type": "string",
+      "pattern": "^sub_[A-Za-z0-9]{1,64}$"
+    },
+    "timestamp": {
+      "description": "RFC 3339 timestamp of when the user made the decision (not when the reply was transmitted). Used by the producer to verify the reply arrives within timeout_seconds of the originating event.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "decided_by": {
+      "description": "Identifier of the user, system, or policy that made the decision. Useful for audit logging. Common patterns: 'user:<id>', 'auto:configured_policy', 'system:<service>'.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "examples": [
+        "user:folake",
+        "user:abdulrafiu",
+        "auto:configured_policy",
+        "system:admin-override"
+      ]
+    },
+    "decision_rationale": {
+      "description": "Optional free-form text explaining the decision, if the user provided one. Useful for audit and for cases where the producer might learn from the rationale.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "modified_action": {
+      "description": "When the subscriber permits negotiated decisions (e.g., 'accept but with modified parameters'), this object describes the modification. Producer support for this field is OPTIONAL; if the producer does not support modified actions, it MUST treat such a reply as 'reject'.",
+      "type": "object"
+    },
+    "correlation_id": {
+      "description": "Optional trace identifier for cross-system correlation.",
+      "type": "string"
+    }
+  },
+
+  "additionalProperties": false,
+
+  "examples": [
+    {
+      "type": "confirmation.reply",
+      "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+      "decision": "accept",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:24.812Z"
+    },
+    {
+      "type": "confirmation.reply",
+      "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+      "decision": "accept",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:24.812Z",
+      "decided_by": "user:folake"
+    },
+    {
+      "type": "confirmation.reply",
+      "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+      "decision": "reject",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:24.812Z",
+      "decided_by": "user:folake",
+      "decision_rationale": "User wants to reduce transfer amount first."
+    },
+    {
+      "type": "confirmation.reply",
+      "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+      "decision": "accept",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:24.812Z",
+      "decided_by": "user:folake",
+      "modified_action": {
+        "field": "amount",
+        "original_value": 500,
+        "modified_value": 300,
+        "reason": "User accepted transfer but at lower amount"
+      }
+    }
+  ]
+}

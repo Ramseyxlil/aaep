@@ -1,0 +1,30 @@
+{
+  "type": "subscription.request",
+  "aaep_version": "1.0.0",
+  "subscriber_id": "azurelearn-multilingual-bridge",
+  "subscriber_name": "AzureLearn AI Multilingual Subscriber",
+  "subscriber_version": "0.3.0",
+  "capabilities": {
+    "max_events_per_second": 5,
+    "preferred_verbosity": "normal",
+    "languages": ["yo-NG", "ha-NG", "ig-NG", "en-NG", "en-US"],
+    "supports_confirmation_reply": true,
+    "supports_clarification_reply": true,
+    "coalesce_boundaries": ["sentence", "paragraph", "completion"],
+    "event_filters": {
+      "include": ["aaep:agent.*"],
+      "exclude": ["aaep:agent.progress.updated"]
+    },
+    "supported_conformance_levels": [1, 2, 3],
+    "supported_extensions": [
+      "https://aaep-protocol.org/extensions/multilingual-african-languages/v1"
+    ],
+    "cognitive_load": "medium",
+    "pace_wpm": 180,
+    "accept_signed_manifests_only": false,
+    "azlearn": {
+      "tonal_marks": "preserve",
+      "transliteration": "native"
+    }
+  }
+}

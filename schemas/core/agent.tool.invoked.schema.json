@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.tool.invoked.schema.json",
+  "title": "AAEP Event: agent.tool.invoked",
+  "description": "Announces that the producer is about to invoke a tool. MUST be emitted BEFORE the tool's side-effecting operation begins (not after). If the action is irreversible (irreversible=true), the producer MUST have first emitted an agent.awaiting.confirmation event for this invocation and received an 'accept' reply. Defined normatively in Chapter 4 §4.3.1 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "tool", "summary_normal"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.tool.invoked'.",
+      "const": "aaep:agent.tool.invoked"
+    },
+    "tool": {
+      "description": "The tool's identifier (typically its function name). Stable within the producer's vocabulary.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.-]{0,255}$",
+      "examples": [
+        "fetch_balance",
+        "send_email",
+        "transfer_funds",
+        "execute_code",
+        "search_web"
+      ]
+    },
+    "summary_normal": {
+      "description": "Human-readable description of what the producer is doing. Required. Suitable for direct announcement to the user.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_terse": {
+      "description": "Shorter form for terse verbosity. Example: 'Checking balance.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_detailed": {
+      "description": "Longer form with argument context and rationale.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "description": {
+      "description": "The tool's static description (from the tool's manifest or registration). Distinct from summary_normal: this describes what the tool does in general; summary_normal describes what this specific invocation is doing.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "args_summary": {
+      "description": "Summarized arguments suitable for announcement. Producers MUST NOT include sensitive secrets (API keys, passwords, full PII) in this field. PII the user themselves supplied (e.g., the email address they typed) MAY appear.",
+      "type": "string",
+      "maxLength": 16384
+    },
+    "expected_duration_ms": {
+      "description": "How long the producer expects the tool to take. Helps subscribers decide whether to announce a 'this may take a moment' hint.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    },
+    "risk_level": {
+      "description": "Producer's classification of this action's potential impact. Affects required default_decision when this invocation is preceded by a confirmation event (see Chapter 6 §6.4.1).",
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "default": "low"
+    },
+    "irreversible": {
+      "description": "Whether the action is irreversible. If true, the producer MUST have first received user consent via an agent.awaiting.confirmation event with default_decision='reject' (per Chapter 6 §6.4.1).",
+      "type": "boolean",
+      "default": false
+    },
+    "tool_call_id": {
+      "description": "Identifier correlating this invocation with its matching agent.tool.completed event. Unique within the session. Recommended when multiple concurrent tools may be invoked.",
+      "type": "string",
+      "pattern": "^call_[A-Za-z0-9]{1,64}$",
+      "examples": [
+        "call_7a2b9c4e",
+        "call_3f8d1a5b2c9e4f7a"
+      ]
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.invoked",
+      "event_id": "evt_9f3c2a8b5d1e7f4a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:14.527Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "fetch_balance",
+      "summary_normal": "Retrieving your checking account balance."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.invoked",
+      "event_id": "evt_9f3c2a8b5d1e7f4a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:14.527Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "fetch_balance",
+      "tool_call_id": "call_7a2b9c4e",
+      "description": "Retrieve account balance from financial data service",
+      "args_summary": "account_id: checking-7821",
+      "summary_terse": "Checking balance.",
+      "summary_normal": "Retrieving your checking account balance.",
+      "expected_duration_ms": 2000,
+      "risk_level": "low",
+      "irreversible": false
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.invoked",
+      "event_id": "evt_b8c4e9a2f5d1a8c4",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:25.012Z",
+      "producer": {
+        "agent_id": "banking-assistant",
+        "agent_version": "3.0.1"
+      },
+      "urgency": "normal",
+      "tool": "transfer_funds",
+      "tool_call_id": "call_3f8d1a5b2c9e4f7a",
+      "description": "Move funds between accounts",
+      "args_summary": "from: checking-7821, to: savings-3344, amount: $500.00",
+      "summary_terse": "Transferring.",
+      "summary_normal": "Transferring $500 from checking to savings.",
+      "summary_detailed": "Initiating funds transfer of $500.00 from account checking-7821 to account savings-3344. User confirmation received at 14:22:24.812Z (reply_token rpl_4f8a2e7d9c1b6a3f).",
+      "expected_duration_ms": 3000,
+      "risk_level": "high",
+      "irreversible": true
+    }
+  ]
+}

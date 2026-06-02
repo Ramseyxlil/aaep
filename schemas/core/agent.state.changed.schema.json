@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.state.changed.schema.json",
+  "title": "AAEP Event: agent.state.changed",
+  "description": "Announces that the producer has transitioned from one internal state to another. State transitions describe the producer's reasoning lifecycle (idle, thinking, calling_tool, writing_output, awaiting_input, deciding, handing_off). Defined normatively in Chapter 4 §4.2.1 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "from_state", "to_state"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.state.changed'.",
+      "const": "aaep:agent.state.changed"
+    },
+    "from_state": {
+      "description": "The state being exited. The first agent.state.changed of a session MUST have from_state='idle'. Subsequent events MUST chain (from_state of event N MUST equal to_state of event N-1 unless intervening events change the implicit state).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "examples": [
+        "idle",
+        "thinking",
+        "calling_tool",
+        "writing_output",
+        "awaiting_input",
+        "deciding",
+        "handing_off"
+      ]
+    },
+    "to_state": {
+      "description": "The state being entered. Producers MAY use non-standard state strings as long as they are consistently meaningful; subscribers MUST gracefully handle unrecognized state strings.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "examples": [
+        "idle",
+        "thinking",
+        "calling_tool",
+        "writing_output",
+        "awaiting_input",
+        "deciding",
+        "handing_off"
+      ]
+    },
+    "summary_terse": {
+      "description": "Brief description of the new state. Example: 'Thinking.' or 'Calling tool.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Standard description of the new state with light context.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed description with rationale for the transition.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "expected_duration_ms": {
+      "description": "How long the new state is expected to last. Helps subscribers decide whether to announce immediately or wait for the next state.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.state.changed",
+      "event_id": "evt_7d2a8c1f5e3b6a9d",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:13.108Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "background",
+      "from_state": "idle",
+      "to_state": "thinking"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.state.changed",
+      "event_id": "evt_7d2a8c1f5e3b6a9d",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:13.108Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "background",
+      "from_state": "idle",
+      "to_state": "thinking",
+      "summary_terse": "Thinking.",
+      "summary_normal": "Analyzing your retirement planning question.",
+      "expected_duration_ms": 4000
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.state.changed",
+      "event_id": "evt_8e3b9d2g6f4c7b0e",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:14.412Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "from_state": "thinking",
+      "to_state": "calling_tool",
+      "summary_normal": "Preparing to retrieve your account balance."
+    }
+  ]
+}

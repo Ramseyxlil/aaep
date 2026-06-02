@@ -1,0 +1,38 @@
+# Issue template chooser configuration.
+# See https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔒 Security vulnerability
+    url: https://github.com/Ramseyxlil/aaep/security/advisories/new
+    about: |
+      Please report security vulnerabilities privately via GitHub Security
+      Advisories or email security@aaep-protocol.org — do NOT open a public
+      issue. See SECURITY.md for our coordinated disclosure policy.
+
+  - name: 📜 Code of Conduct concern
+    url: mailto:conduct@aaep-protocol.org
+    about: |
+      Report Code of Conduct violations or community concerns privately.
+      Use conduct-escalation@aaep-protocol.org if the issue involves a
+      maintainer. See CODE_OF_CONDUCT.md for the full process.
+
+  - name: 💬 Question or discussion
+    url: https://github.com/Ramseyxlil/aaep/discussions
+    about: |
+      Ask a question or start a discussion. Use Discussions for open-ended
+      questions ("How should I structure this?"); use Issues for specific,
+      actionable items.
+
+  - name: 📚 Read the specification
+    url: https://aaep-protocol.org/spec/
+    about: |
+      Before reporting a spec issue, check the current spec — your question
+      may already be answered there.
+
+  - name: 📖 Read the FAQ
+    url: https://aaep-protocol.org/guides/faq.html
+    about: |
+      Common questions are answered in the FAQ. Skim it first to save
+      everyone time.

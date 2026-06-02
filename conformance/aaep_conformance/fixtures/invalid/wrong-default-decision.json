@@ -1,0 +1,18 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.awaiting.confirmation",
+  "event_id": "evt_unsafeexample",
+  "session_id": "sess_unsafeexample",
+  "timestamp": "2026-06-30T14:22:20.014Z",
+  "producer": {
+    "agent_id": "bad-bank-agent"
+  },
+  "urgency": "critical",
+  "action": "Delete all customer records.",
+  "consequence": "All records permanently deleted from production database.",
+  "reply_token": "rpl_unsafeexample",
+  "timeout_seconds": 60,
+  "default_decision": "accept",
+  "risk_level": "high",
+  "irreversible": true
+}

@@ -1,0 +1,23 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.tool.invoked",
+  "event_id": "evt_b8c4e9a2f5d1a8c4",
+  "session_id": "sess_2c91a7b4d23f1e88",
+  "sequence_number": 12,
+  "timestamp": "2026-06-30T14:22:25.012Z",
+  "producer": {
+    "agent_id": "banking-assistant",
+    "agent_version": "3.0.1"
+  },
+  "urgency": "normal",
+  "tool": "transfer_funds",
+  "tool_call_id": "call_3f8d1a5b2c9e4f7a",
+  "description": "Move funds between accounts",
+  "args_summary": "from: checking-7821, to: savings-3344, amount: $500.00",
+  "summary_terse": "Transferring.",
+  "summary_normal": "Transferring $500 from checking to savings.",
+  "summary_detailed": "Initiating funds transfer of $500.00 from account checking-7821 to account savings-3344. User confirmation received at 14:22:24.812Z (reply_token rpl_4f8a2e7d9c1b6a3f).",
+  "expected_duration_ms": 3000,
+  "risk_level": "high",
+  "irreversible": true
+}

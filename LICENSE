@@ -1,0 +1,113 @@
+AAEP — Agent Accessibility Event Protocol
+==========================================
+
+This repository uses a split-license model.
+
+------------------------------------------------------------------------
+1. SPECIFICATION, SCHEMAS, AND DOCUMENTATION
+------------------------------------------------------------------------
+
+The following materials are licensed under the
+Creative Commons Attribution 4.0 International License (CC-BY-4.0):
+
+  • Everything in the `spec/` directory
+  • Everything in the `schemas/` directory
+  • Everything in the `guides/` directory
+  • Everything in the `governance/` directory (except code)
+  • The `website/` content (text, not code)
+  • All Markdown files at the repository root
+
+Full license text: see LICENSE-CC-BY-4.0
+Human-readable summary: https://creativecommons.org/licenses/by/4.0/
+
+You are free to:
+
+  • Share — copy and redistribute the material in any medium or format
+  • Adapt — remix, transform, and build upon the material for any
+    purpose, even commercially.
+
+Under the following terms:
+
+  • Attribution — You must give appropriate credit, provide a link to
+    the license, and indicate if changes were made. You may do so in
+    any reasonable manner, but not in any way that suggests the
+    licensor endorses you or your use.
+
+  • No additional restrictions — You may not apply legal terms or
+    technological measures that legally restrict others from doing
+    anything the license permits.
+
+------------------------------------------------------------------------
+2. CODE, EXAMPLES, CONFORMANCE TESTS, AND TOOLS
+------------------------------------------------------------------------
+
+The following materials are licensed under the MIT License:
+
+  • Everything in the `conformance/` directory (source code)
+  • Everything in the `examples/` directory
+  • Everything in the `tools/` directory
+  • Everything in the `website/` directory (build scripts, source code)
+  • Any other source code in the repository not covered above
+
+Full license text: see LICENSE-MIT
+
+You are free to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the software, subject to the
+conditions stated in LICENSE-MIT.
+
+------------------------------------------------------------------------
+3. WHY A SPLIT LICENSE
+------------------------------------------------------------------------
+
+The specification, schemas, and guides are licensed under CC-BY-4.0
+because they are reference works. Implementers and adopters must be
+able to quote the spec, paraphrase it in their own documentation, and
+incorporate it into their own materials with only an attribution
+requirement. This is standard practice for open standards (see W3C
+Recommendations, IETF RFCs, and most modern protocol projects).
+
+The code is licensed under the MIT License because the examples,
+conformance tests, and tools are intended to be copied directly into
+commercial and non-commercial implementations without restriction.
+This is the most permissive standard license and is the de facto
+expectation for protocol reference implementations.
+
+The two licenses are compatible: a project incorporating both can
+satisfy both sets of requirements simultaneously. See NOTICE for
+attribution guidance.
+
+------------------------------------------------------------------------
+4. ATTRIBUTION GUIDANCE
+------------------------------------------------------------------------
+
+Suggested attribution string for any project incorporating AAEP
+specification or code:
+
+    "This product includes work from the AAEP project
+    (https://github.com/Ramseyxlil/aaep), founded by Abdulrafiu Izuafa,
+    licensed under CC-BY-4.0 and MIT."
+
+Use of the AAEP name and logo to identify your product as
+AAEP-compliant is permitted under the terms of CC-BY-4.0 provided
+that:
+
+  (a) your implementation passes the corresponding conformance level
+      defined in spec/09-conformance.md, and
+  (b) you do not imply endorsement by AAEP maintainers without
+      explicit written permission.
+
+For commercial use of the AAEP name in marketing materials beyond
+identifying conformance, please contact the maintainer.
+
+------------------------------------------------------------------------
+5. CONTACT
+------------------------------------------------------------------------
+
+Maintainer:        Abdulrafiu Izuafa
+Email:             Abdulrafiu@izusoft.tech
+Repository:        https://github.com/Ramseyxlil/aaep
+Project website:   https://aaep-protocol.org 
+
+------------------------------------------------------------------------
+End of LICENSE notice.
+------------------------------------------------------------------------

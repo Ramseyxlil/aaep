@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAEP Web Subscriber Demo</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+    code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; }
+    pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+    .demo-header { border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 2rem; }
+    .demo-instructions { background: #eff6ff; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+    .demo-instructions h2 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <header class="demo-header">
+    <h1>AAEP Web Subscriber Demo</h1>
+    <p>
+      Reference React subscriber for the
+      <a href="https://aaep-protocol.org">Agent Accessibility Event Protocol</a>.
+      Demonstrates browser-based AAEP consumption with ARIA live regions.
+    </p>
+  </header>
+
+  <main>
+    <section>
+      <h2>What this demo shows</h2>
+      <p>
+        When you mount <code>&lt;AAEPSubscriber&gt;</code> in a React app pointing at
+        any AAEP producer, you get:
+      </p>
+      <ul>
+        <li>Automatic screen-reader announcements for all 12 AAEP event types</li>
+        <li>Keyboard-accessible confirmation flow with <kbd>A</kbd>/<kbd>R</kbd> shortcuts</li>
+        <li>Numbered clarification options</li>
+        <li>Automatic reconnection with exponential backoff</li>
+        <li>Optional visible event log for debugging</li>
+      </ul>
+    </section>
+
+    <section class="demo-instructions">
+      <h2>Run this demo locally</h2>
+      <ol>
+        <li>
+          Start any AAEP producer (e.g., from <code>examples/producers/python-minimal/</code>):
+          <pre><code>python -m aaep_minimal_producer.server --port 8080</code></pre>
+        </li>
+        <li>
+          Install and build this package:
+          <pre><code>cd examples/subscribers/web-subscriber-react
+npm install
+npm run dev</code></pre>
+        </li>
+        <li>Open the dev server URL (typically <code>http://localhost:5173</code>).</li>
+        <li>
+          Turn on a screen reader (NVDA on Windows, VoiceOver on macOS, Orca on Linux)
+          to hear the announcements.
+        </li>
+        <li>
+          Send a request to the producer to drive a session:
+          <pre><code>curl -X POST http://localhost:8080/sessions \
+    -H "Content-Type: application/json" \
+    -d '{"user_message": "Send email to alice@example.com"}'</code></pre>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Basic integration</h2>
+      <pre><code>import { AAEPSubscriber } from "@aaep/web-subscriber-react";
+import "@aaep/web-subscriber-react/styles.css";
+
+function MyApp() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;My AI Assistant&lt;/h1&gt;
+      &lt;AAEPSubscriber
+        endpoint="http://localhost:8080"
+        preferredLanguages={["en"]}
+        showEventLog={true}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Multilingual</h2>
+      <p>
+        Configure preferred languages to support Yoruba, Hausa, Igbo, or any other
+        language a producer emits:
+      </p>
+      <pre><code>&lt;AAEPSubscriber
+  endpoint="http://localhost:8080"
+  preferredLanguages={["yo", "en"]}  // Prefer Yoruba, fall back to English
+/&gt;</code></pre>
+    </section>
+
+    <section>
+      <h2>See also</h2>
+      <ul>
+        <li><a href="https://aaep-protocol.org/spec/">AAEP Specification</a></li>
+        <li><a href="https://github.com/Ramseyxlil/aaep">Source repository</a></li>
+        <li><a href="../README.md">Component README</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

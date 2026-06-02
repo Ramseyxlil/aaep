@@ -1,0 +1,11 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.session.started",
+  "event_id": "not-following-the-pattern",
+  "session_id": "sess_valid001",
+  "timestamp": "2026-06-30T14:22:11.342Z",
+  "producer": {
+    "agent_id": "test-agent"
+  },
+  "summary_normal": "Test session."
+}

@@ -1,0 +1,114 @@
+name: ✨ Feature request
+description: Propose a new feature, capability, or improvement
+title: "[Feature]: "
+labels:
+  - enhancement
+  - triage
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing a feature! Substantive proposals will need to
+        become [ACPs](https://github.com/Ramseyxlil/aaep/tree/main/governance/proposals)
+        before they can be merged. This issue is the starting point for that
+        discussion.
+
+        **Before submitting:** please search [open and closed issues](https://github.com/Ramseyxlil/aaep/issues?q=is%3Aissue) to avoid duplicates.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Proposal scope
+      description: Which part of the project would this affect?
+      options:
+        - Core specification (likely requires ACP)
+        - JSON schemas (likely requires ACP)
+        - New canonical extension (requires ACP)
+        - Reference implementation (no ACP needed)
+        - Conformance suite (no ACP needed)
+        - Tooling (no ACP needed)
+        - Website / documentation (no ACP needed)
+        - Governance process (requires ACP)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        Describe the concrete problem this feature would address. Avoid
+        generic motivations ("users would benefit"); be specific about who
+        is affected and how.
+      placeholder: |
+        Example: "Screen reader users currently can't tell whether an
+        agent's tool call is a database read or a database write. Both emit
+        identical 'tool.invoked' events. When the agent writes to a record,
+        the user has no way to know without checking the tool name against
+        their own mental model of what each tool does."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe what you'd like to see implemented.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        What other approaches did you consider? Why is your proposed solution
+        the right one? Even if you only thought briefly about alternatives,
+        listing them helps reviewers understand your reasoning.
+    validations:
+      required: true
+
+  - type: textarea
+    id: accessibility-impact
+    attributes:
+      label: Accessibility implications
+      description: |
+        Which AT user groups benefit from this? Are any AT users disadvantaged?
+        How does this interact with existing accessibility standards? **Required
+        for every feature proposal.**
+    validations:
+      required: true
+
+  - type: textarea
+    id: backward-compat
+    attributes:
+      label: Backward compatibility
+      description: |
+        Will this change require existing producers or subscribers to update?
+        If yes, what's the migration path?
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Reference implementations or precedents
+      description: |
+        Are there similar features in other accessibility protocols, AT
+        systems, or AI agent frameworks? Link to them.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I have searched existing issues to confirm this hasn't been proposed.
+          required: true
+        - label: I understand that substantive proposals require an ACP per the [governance process](https://github.com/Ramseyxlil/aaep/blob/main/governance/GOVERNANCE.md).
+          required: true
+        - label: I agree to follow the [Code of Conduct](https://github.com/Ramseyxlil/aaep/blob/main/governance/CODE_OF_CONDUCT.md).
+          required: true

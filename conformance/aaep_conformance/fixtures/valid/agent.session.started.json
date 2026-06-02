@@ -1,0 +1,29 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "aaep_version": "1.0.0",
+  "type": "aaep:agent.session.started",
+  "event_id": "evt_8a3f5b22c91e4d7a",
+  "session_id": "sess_2c91a7b4d23f1e88",
+  "sequence_number": 0,
+  "timestamp": "2026-06-30T14:22:11.342Z",
+  "producer": {
+    "agent_id": "retirement-planner",
+    "agent_version": "1.4.2",
+    "agent_name": "Retirement Planning Assistant",
+    "model": "claude-opus-4-7"
+  },
+  "urgency": "normal",
+  "verbosity": "normal",
+  "localization_hints": {
+    "primary_language": "en-US",
+    "text_direction": "ltr",
+    "available_languages": ["en-US", "yo-NG", "es-419"]
+  },
+  "summary_terse": "Started.",
+  "summary_normal": "Retirement Planning Assistant is processing your request.",
+  "summary_detailed": "Retirement Planning Assistant is processing your request to plan retirement savings strategy. Estimated 30 seconds.",
+  "expected_duration_ms": 30000,
+  "requested_by": "user:folake",
+  "request_text": "Plan my retirement savings strategy.",
+  "tools_available": ["fetch_balance", "calculate_projection", "draft_plan"]
+}

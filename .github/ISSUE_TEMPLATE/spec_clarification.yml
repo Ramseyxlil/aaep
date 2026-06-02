@@ -1,0 +1,104 @@
+name: 📋 Specification clarification
+description: Report ambiguous, unclear, or contradictory specification language
+title: "[Spec]: "
+labels:
+  - specification
+  - clarification
+  - triage
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reading the specification carefully enough to find a
+        problem. Specification clarity is critical — every implementer
+        depends on the spec meaning what it says.
+
+        Use this template for:
+        - Ambiguous language ("It is unclear whether X means A or B")
+        - Contradictions between sections
+        - Missing edge cases
+        - Mismatches between the spec and the JSON Schemas
+        - Mismatches between the spec and the reference implementations
+
+        Use the **bug report** template for code bugs and the **feature
+        request** template for proposed additions.
+
+  - type: input
+    id: location
+    attributes:
+      label: Location in the spec
+      description: |
+        Chapter and section (or schema file) where the issue exists.
+      placeholder: "e.g., Chapter 4 §4.7.2, or schemas/v1/events/awaiting-confirmation.json"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Spec version
+      description: Which AAEP version are you reading?
+      placeholder: "e.g., 1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's unclear or wrong?
+      description: |
+        Quote the relevant spec text and describe the problem. Be specific
+        about what could be interpreted multiple ways.
+    validations:
+      required: true
+
+  - type: textarea
+    id: interpretations
+    attributes:
+      label: Possible interpretations
+      description: |
+        What are the different ways an implementer might read this? If you've
+        seen actual implementations interpret it differently, mention them.
+      placeholder: |
+        Interpretation A: ...
+        Interpretation B: ...
+
+        Currently, python-minimal interprets it as A, but the conformance suite
+        appears to test for B.
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested clarification
+      description: |
+        Propose specific replacement language for the spec. We'll consider it
+        as a starting point even if reviewers refine it.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How likely is this ambiguity to cause implementations to disagree?
+      options:
+        - "Critical: implementations will produce incompatible events"
+        - "High: ambiguity could cause subtle bugs in production"
+        - "Medium: edge case that's easy to get wrong"
+        - "Low: pedantic clarity improvement"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I have searched existing issues to confirm this hasn't been reported.
+          required: true
+        - label: I agree to follow the [Code of Conduct](https://github.com/Ramseyxlil/aaep/blob/main/governance/CODE_OF_CONDUCT.md).
+          required: true

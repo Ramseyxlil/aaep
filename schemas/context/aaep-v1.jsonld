@@ -1,0 +1,194 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@protected": true,
+
+    "aaep": "https://aaep-protocol.org/vocab/v1#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "type": "@type",
+    "id": "@id",
+
+    "event_id": "aaep:event_id",
+    "session_id": "aaep:session_id",
+    "sequence_number": {
+      "@id": "aaep:sequence_number",
+      "@type": "xsd:integer"
+    },
+    "timestamp": {
+      "@id": "aaep:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "aaep_version": "aaep:aaep_version",
+    "correlation_id": "aaep:correlation_id",
+    "verbosity": "aaep:verbosity",
+    "urgency": "aaep:urgency",
+
+    "producer": {
+      "@id": "aaep:producer",
+      "@type": "@id"
+    },
+    "agent_id": "aaep:agent_id",
+    "agent_version": "aaep:agent_version",
+    "agent_name": "aaep:agent_name",
+    "model": "aaep:model",
+    "manifest_uri": {
+      "@id": "aaep:manifest_uri",
+      "@type": "@id"
+    },
+
+    "localization_hints": "aaep:localization_hints",
+    "primary_language": "aaep:primary_language",
+    "text_direction": "aaep:text_direction",
+    "available_languages": {
+      "@id": "aaep:available_languages",
+      "@container": "@list"
+    },
+    "fallback_chain": {
+      "@id": "aaep:fallback_chain",
+      "@container": "@list"
+    },
+    "script": "aaep:script",
+    "calendar": "aaep:calendar",
+
+    "extensions": "aaep:extensions",
+
+    "summary_terse": "aaep:summary_terse",
+    "summary_normal": "aaep:summary_normal",
+    "summary_detailed": "aaep:summary_detailed",
+    "description": "aaep:description",
+
+    "expected_duration_ms": {
+      "@id": "aaep:expected_duration_ms",
+      "@type": "xsd:integer"
+    },
+    "duration_ms": {
+      "@id": "aaep:duration_ms",
+      "@type": "xsd:integer"
+    },
+
+    "requested_by": "aaep:requested_by",
+    "request_text": "aaep:request_text",
+    "tools_available": {
+      "@id": "aaep:tools_available",
+      "@container": "@list"
+    },
+    "tool_invocations_count": {
+      "@id": "aaep:tool_invocations_count",
+      "@type": "xsd:integer"
+    },
+    "output_summary": "aaep:output_summary",
+    "result_uri": {
+      "@id": "aaep:result_uri",
+      "@type": "@id"
+    },
+
+    "error_category": "aaep:error_category",
+    "error_code": "aaep:error_code",
+    "error_uri": {
+      "@id": "aaep:error_uri",
+      "@type": "@id"
+    },
+    "error_message": "aaep:error_message",
+    "recoverable": {
+      "@id": "aaep:recoverable",
+      "@type": "xsd:boolean"
+    },
+    "remediation_hint": "aaep:remediation_hint",
+
+    "cancelled_by": "aaep:cancelled_by",
+    "cancellation_reason": "aaep:cancellation_reason",
+    "partial_result": "aaep:partial_result",
+
+    "from_state": "aaep:from_state",
+    "to_state": "aaep:to_state",
+
+    "progress": "aaep:progress",
+    "percent": {
+      "@id": "aaep:percent",
+      "@type": "xsd:decimal"
+    },
+    "step": {
+      "@id": "aaep:step",
+      "@type": "xsd:integer"
+    },
+    "total_steps": {
+      "@id": "aaep:total_steps",
+      "@type": "xsd:integer"
+    },
+    "eta_ms": {
+      "@id": "aaep:eta_ms",
+      "@type": "xsd:integer"
+    },
+
+    "tool": "aaep:tool",
+    "tool_call_id": "aaep:tool_call_id",
+    "args_summary": "aaep:args_summary",
+    "risk_level": "aaep:risk_level",
+    "irreversible": {
+      "@id": "aaep:irreversible",
+      "@type": "xsd:boolean"
+    },
+    "reversibility": "aaep:reversibility",
+    "status": "aaep:status",
+
+    "chunk": "aaep:chunk",
+    "position": {
+      "@id": "aaep:position",
+      "@type": "xsd:integer"
+    },
+    "complete": {
+      "@id": "aaep:complete",
+      "@type": "xsd:boolean"
+    },
+    "coalesce_hint": "aaep:coalesce_hint",
+    "output_id": "aaep:output_id",
+    "content_type": "aaep:content_type",
+    "language": "aaep:language",
+
+    "action": "aaep:action",
+    "consequence": "aaep:consequence",
+    "reply_token": "aaep:reply_token",
+    "timeout_seconds": {
+      "@id": "aaep:timeout_seconds",
+      "@type": "xsd:integer"
+    },
+    "default_decision": "aaep:default_decision",
+    "allowed_replies": {
+      "@id": "aaep:allowed_replies",
+      "@container": "@set"
+    },
+    "extra_context": "aaep:extra_context",
+
+    "question": "aaep:question",
+    "accepted_response_kinds": {
+      "@id": "aaep:accepted_response_kinds",
+      "@container": "@set"
+    },
+    "choices": {
+      "@id": "aaep:choices",
+      "@container": "@list"
+    },
+    "default_response": "aaep:default_response",
+    "context": "aaep:context",
+
+    "reason": "aaep:reason",
+    "target_kind": "aaep:target_kind",
+    "target_uri": {
+      "@id": "aaep:target_uri",
+      "@type": "@id"
+    },
+    "packaged_context": "aaep:packaged_context",
+    "urgency_for_handoff": "aaep:urgency_for_handoff",
+
+    "decision": "aaep:decision",
+    "decided_by": "aaep:decided_by",
+    "decision_rationale": "aaep:decision_rationale",
+    "modified_action": "aaep:modified_action",
+    "response": "aaep:response",
+    "confidence": {
+      "@id": "aaep:confidence",
+      "@type": "xsd:decimal"
+    }
+  }
+}

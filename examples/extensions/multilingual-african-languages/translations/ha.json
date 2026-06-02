@@ -1,0 +1,104 @@
+{
+  "language": "ha",
+  "name_native": "Hausa",
+  "name_english": "Hausa",
+  "tone_marks_required": false,
+  "recommended_pace_wpm": {"min": 130, "max": 170},
+  "fallback_languages": ["en"],
+  "scripts": {
+    "default": "latin",
+    "available": ["latin", "ajami"]
+  },
+  "translator_credits": [
+    {
+      "name": "Initial author review",
+      "level": "fluent",
+      "date": "2026-06-30",
+      "note": "Translations use standardized Latin (Boko) orthography with hooked letters ɓ, ɗ, ƙ. Ajami (Arabic script) variants tracked separately and can be added per ACP."
+    }
+  ],
+  "events": {
+    "aaep:agent.session.started": {
+      "summary_terse": "Farawa",
+      "summary_normal": "Ina farawa aikinka",
+      "summary_detailed": "Ina farawa aikin da ka nema: {request_text}",
+      "notes": "'Ina farawa' = 'I am beginning'. Present continuous, standard Hausa."
+    },
+    "aaep:agent.session.completed": {
+      "summary_terse": "An gama",
+      "summary_normal": "Na gama aikin",
+      "summary_detailed": "Na gama aikin a cikin millisecond {duration_ms}. Na yi amfani da kayan aiki {tool_invocations_count}.",
+      "notes": "'Na gama' = 'I finished' (perfective). 'An gama' = 'it is done' (impersonal)."
+    },
+    "aaep:agent.session.errored": {
+      "summary_terse": "Kuskure",
+      "summary_normal": "Aikin bai yi nasara ba saboda kuskure",
+      "summary_detailed": "Aikin bai yi nasara ba saboda: {error_message}. Za a iya gyara: {recoverable}",
+      "notes": "'Kuskure' = mistake/error. 'Bai yi nasara ba' = literally 'did not succeed'."
+    },
+    "aaep:agent.session.cancelled": {
+      "summary_terse": "An dakatar",
+      "summary_normal": "An dakatar da aikin",
+      "summary_detailed": "{cancelled_by} ya dakatar da aikin",
+      "notes": "'Dakatar' = stop/halt. Verb takes agent in fuller form."
+    },
+    "aaep:agent.state.changed": {
+      "summary_terse": "Canji",
+      "summary_normal": "Na canza zuwa matsayin {to_state}",
+      "summary_detailed": "Na canza daga {from_state} zuwa {to_state}",
+      "notes": "'Canza' = change/transform. 'Matsayi' = state/position."
+    },
+    "aaep:agent.progress.updated": {
+      "summary_terse": "Cigaba",
+      "summary_normal": "Na gama kashi {progress_percent} cikin ɗari",
+      "summary_detailed": "Na gama kashi {progress_percent} cikin ɗari. {progress_message}",
+      "notes": "Hausa expresses percentage as 'kashi X cikin ɗari' = 'part X out of hundred'."
+    },
+    "aaep:agent.tool.invoked": {
+      "summary_terse": "Amfani da kayan aiki",
+      "summary_normal": "Ina amfani da kayan aiki {tool}",
+      "summary_detailed": "Ina amfani da kayan aiki {tool} tare da {args_summary}",
+      "notes": "'Kayan aiki' = tools/instruments (lit. 'things of work')."
+    },
+    "aaep:agent.tool.completed": {
+      "summary_terse": "Kayan aiki ya kammala",
+      "summary_normal": "Kayan aiki {tool} ya kammala",
+      "summary_detailed": "Kayan aiki {tool} ya kammala da sakamako: {status}",
+      "notes": "'Sakamako' = result/outcome."
+    },
+    "aaep:agent.output.streaming": {
+      "summary_terse": "",
+      "summary_normal": "",
+      "summary_detailed": "",
+      "notes": "Streaming events use empty summaries; chunk content is the speech."
+    },
+    "aaep:agent.awaiting.confirmation": {
+      "summary_terse": "Bukatar tabbatarwa",
+      "summary_normal": "Ka yarda in yi {action}?",
+      "summary_detailed": "Ina bukatar tabbatarwarka kafin in yi {action}. Sakamako: {consequence}",
+      "notes": "'Ka yarda in yi X?' = 'do you agree that I do X?' — natural Hausa confirmation request. 'Tabbatarwa' = confirmation."
+    },
+    "aaep:agent.awaiting.clarification": {
+      "summary_terse": "Tambaya",
+      "summary_normal": "{question}",
+      "summary_detailed": "Ina da tambaya: {question}",
+      "notes": "'Tambaya' = question. Direct pass-through for question text."
+    },
+    "aaep:agent.handoff.requested": {
+      "summary_terse": "Mika aiki",
+      "summary_normal": "Zan mika aikin ga wani saboda {reason}",
+      "summary_detailed": "Zan mika aikin ga {handoff_target} saboda: {reason}",
+      "notes": "'Mika' = pass/hand over. Future tense 'Zan' marks intent."
+    }
+  },
+  "common_phrases": {
+    "yes": "Eh",
+    "no": "A'a",
+    "please": "Don Allah",
+    "thank_you": "Na gode",
+    "i_dont_know": "Ban sani ba",
+    "wait": "Jira",
+    "try_again": "Sake gwadawa",
+    "this_is_important": "Wannan yana da muhimmanci"
+  }
+}

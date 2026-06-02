@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.session.started.schema.json",
+  "title": "AAEP Event: agent.session.started",
+  "description": "Announces the beginning of an agent session. This is the first event of every session and the anchor for the session's session_id. Defined normatively in Chapter 4 §4.1.1 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "summary_normal"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.session.started'.",
+      "const": "aaep:agent.session.started"
+    },
+    "summary_normal": {
+      "description": "Human-readable description of what the session will do at normal verbosity. Suitable for direct announcement to the user. Required on every agent.session.started event.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_terse": {
+      "description": "Shorter form of summary_normal for terse verbosity. Typically a few words.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_detailed": {
+      "description": "Longer form of summary_normal for detailed verbosity. Includes context, expected steps, and rationale where useful.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "expected_duration_ms": {
+      "description": "Producer's estimate of total session duration in milliseconds. Subscribers MAY use this to set up progress UI or advise the user of expected wait time.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    },
+    "requested_by": {
+      "description": "Identifier of the user, system, or process that initiated the session. Format is producer-defined; common patterns are 'user:<id>', 'system:<service>', or 'agent:<agent_id>'.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "request_text": {
+      "description": "The original natural-language request from the user, if available and not sensitive. Producers MUST NOT include secrets or excessive PII in this field.",
+      "type": "string",
+      "maxLength": 16384
+    },
+    "tools_available": {
+      "description": "List of tool names the agent has access to in this session. Aids subscribers in setting expectations about possible actions.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "maxItems": 256,
+      "uniqueItems": true
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.started",
+      "event_id": "evt_8a3f5b22c91e4d7a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:11.342Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "summary_normal": "Retirement Planning Assistant is processing your request."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.started",
+      "event_id": "evt_8a3f5b22c91e4d7a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:11.342Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2",
+        "agent_name": "Retirement Planning Assistant",
+        "model": "claude-opus-4-7"
+      },
+      "urgency": "normal",
+      "verbosity": "normal",
+      "localization_hints": {
+        "primary_language": "en-US",
+        "text_direction": "ltr",
+        "available_languages": ["en-US", "yo-NG", "es-419"]
+      },
+      "summary_terse": "Started.",
+      "summary_normal": "Retirement Planning Assistant is processing your request.",
+      "summary_detailed": "Retirement Planning Assistant is processing your request to plan retirement savings strategy. Estimated 30 seconds. The assistant will read your financial profile, calculate projections, and draft a recommendation.",
+      "expected_duration_ms": 30000,
+      "requested_by": "user:folake",
+      "request_text": "Plan my retirement savings strategy.",
+      "tools_available": ["fetch_balance", "calculate_projection", "draft_plan"]
+    }
+  ]
+}

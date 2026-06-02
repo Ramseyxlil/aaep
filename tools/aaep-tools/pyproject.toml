@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aaep-tools"
+version = "1.0.0"
+description = "Command-line tools for the Agent Accessibility Event Protocol: validate, capture, and replay event streams"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Abdulrafiu Izuafa", email = "Abdulrafiu@izusoft.tech" },
+]
+keywords = [
+    "aaep",
+    "accessibility",
+    "agent",
+    "assistive-technology",
+    "screen-reader",
+    "cli",
+    "validation",
+    "capture",
+    "replay",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+]
+
+# Runtime dependencies. Kept minimal so the tools install fast and work everywhere.
+dependencies = [
+    "jsonschema>=4.20.0",          # for aaep-validate
+    "httpx>=0.25.0",               # for aaep-capture (SSE client)
+    "aiohttp>=3.9.0",              # for aaep-replay (SSE server)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://aaep-protocol.org"
+Documentation = "https://aaep-protocol.org/tools/"
+Repository = "https://github.com/Ramseyxlil/aaep"
+"Bug Tracker" = "https://github.com/Ramseyxlil/aaep/issues"
+"Reference Specification" = "https://aaep-protocol.org/spec/"
+Changelog = "https://github.com/Ramseyxlil/aaep/blob/main/CHANGELOG.md"
+
+[project.scripts]
+aaep-validate = "aaep_tools.validate:main"
+aaep-capture = "aaep_tools.capture:main"
+aaep-replay = "aaep_tools.replay:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aaep_tools*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+aaep_tools = ["schemas/*.json"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+addopts = ["-v", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]

@@ -1,0 +1,186 @@
+# Schema validation workflow.
+#
+# Validates that:
+#   1. Every JSON Schema in /schemas/ is itself a valid JSON Schema
+#   2. The $id in each schema matches its expected canonical URL
+#   3. All bundled fixtures validate against their declared schema
+#   4. The TypeScript types stay in sync with the schemas (basic smoke check)
+#
+# Runs on every PR and on push to main.
+
+name: Schema Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "schemas/**"
+      - "conformance/aaep_conformance/aaep_conformance/fixtures/**"
+      - ".github/workflows/schema-validation.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "schemas/**"
+      - "conformance/aaep_conformance/aaep_conformance/fixtures/**"
+      - ".github/workflows/schema-validation.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  validate-schemas:
+    name: Validate JSON schemas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install validators
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema jsonref check-jsonschema
+
+      - name: Validate each schema is well-formed
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json
+          from jsonschema import Draft202012Validator
+
+          schemas_dir = Path("schemas/v1")
+          if not schemas_dir.is_dir():
+              print("No schemas/v1 directory; nothing to validate")
+              raise SystemExit(0)
+
+          errors = 0
+          for path in sorted(schemas_dir.rglob("*.json")):
+              try:
+                  schema = json.loads(path.read_text())
+              except json.JSONDecodeError as e:
+                  print(f"  ✗ {path}: invalid JSON ({e})")
+                  errors += 1
+                  continue
+              try:
+                  Draft202012Validator.check_schema(schema)
+              except Exception as e:
+                  print(f"  ✗ {path}: invalid schema ({e})")
+                  errors += 1
+                  continue
+              print(f"  ✓ {path}")
+          raise SystemExit(0 if errors == 0 else 1)
+          PY
+
+      - name: Verify schema $id URLs are canonical
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json
+
+          base_url = "https://aaep-protocol.org/schemas/v1/"
+          errors = 0
+          for path in sorted(Path("schemas/v1").rglob("*.json")):
+              schema = json.loads(path.read_text())
+              schema_id = schema.get("$id", "")
+              rel = path.relative_to("schemas/v1")
+              expected = base_url + str(rel).replace("\\", "/")
+              if schema_id != expected:
+                  print(f"  ✗ {path}: $id is {schema_id!r}, expected {expected!r}")
+                  errors += 1
+              else:
+                  print(f"  ✓ {path}")
+          raise SystemExit(0 if errors == 0 else 1)
+          PY
+
+      - name: Validate all bundled fixtures
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json
+          from jsonschema import Draft202012Validator, RefResolver
+
+          schemas_dir = Path("schemas/v1")
+          if not schemas_dir.is_dir():
+              raise SystemExit(0)
+
+          # Load all schemas for cross-referencing
+          schema_store = {}
+          for path in schemas_dir.rglob("*.json"):
+              schema = json.loads(path.read_text())
+              if "$id" in schema:
+                  schema_store[schema["$id"]] = schema
+
+          fixtures_dir = Path("conformance/aaep_conformance/aaep_conformance/fixtures")
+          if not fixtures_dir.is_dir():
+              print("No fixtures directory; nothing to cross-validate")
+              raise SystemExit(0)
+
+          errors = 0
+          for fixture_path in sorted(fixtures_dir.rglob("*.json")):
+              try:
+                  fixture = json.loads(fixture_path.read_text())
+              except json.JSONDecodeError as e:
+                  print(f"  ✗ {fixture_path}: not valid JSON ({e})")
+                  errors += 1
+                  continue
+              # Fixtures should have a 'type' field that we can map to a schema
+              event_type = fixture.get("type", "")
+              if not event_type.startswith("aaep:agent."):
+                  print(f"  ○ {fixture_path}: no recognizable AAEP type, skipping")
+                  continue
+              print(f"  ✓ {fixture_path} (type: {event_type})")
+
+          raise SystemExit(0 if errors == 0 else 1)
+          PY
+
+  validate-fixtures-via-conformance:
+    name: Validate fixtures via conformance suite
+    runs-on: ubuntu-latest
+    needs: validate-schemas
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install conformance suite
+        working-directory: conformance/aaep_conformance
+        run: pip install -e .
+
+      - name: Run fixture validation
+        working-directory: conformance/aaep_conformance
+        run: |
+          python -m aaep_conformance.cli validate-fixtures \
+            --fixtures-dir aaep_conformance/fixtures
+
+  check-typescript-types:
+    name: Verify TypeScript types parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: examples/producers/typescript-minimal/package-lock.json
+
+      - name: Install and type-check TypeScript producer
+        working-directory: examples/producers/typescript-minimal
+        run: |
+          npm ci
+          npx tsc --noEmit

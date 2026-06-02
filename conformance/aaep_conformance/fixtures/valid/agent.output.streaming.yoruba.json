@@ -1,0 +1,25 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.output.streaming",
+  "event_id": "evt_4c7a1f9d3b5e2a8c",
+  "session_id": "sess_2c91a7b4d23f1e89",
+  "sequence_number": 8,
+  "timestamp": "2026-06-30T14:25:11.342Z",
+  "producer": {
+    "agent_id": "multilingual-tutor",
+    "agent_version": "1.0.0",
+    "model": "claude-opus-4-7"
+  },
+  "urgency": "normal",
+  "localization_hints": {
+    "primary_language": "yo-NG",
+    "text_direction": "ltr"
+  },
+  "chunk": "Ẹ ku àárọ̀. Ṣé o sun re?",
+  "position": 0,
+  "complete": false,
+  "coalesce_hint": "sentence",
+  "output_id": "out_3a8c2",
+  "content_type": "text/plain",
+  "language": "yo-NG"
+}

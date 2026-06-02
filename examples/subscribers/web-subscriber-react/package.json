@@ -1,0 +1,68 @@
+{
+  "name": "@aaep/web-subscriber-react",
+  "version": "1.0.0",
+  "description": "React component that subscribes to AAEP producers and integrates with browser ARIA live regions for screen reader accessibility",
+  "license": "MIT",
+  "author": "Abdulrafiu Izuafa <Abdulrafiu@izusoft.tech>",
+  "homepage": "https://aaep-protocol.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ramseyxlil/aaep.git",
+    "directory": "examples/subscribers/web-subscriber-react"
+  },
+  "bugs": {
+    "url": "https://github.com/Ramseyxlil/aaep/issues"
+  },
+  "keywords": [
+    "aaep",
+    "accessibility",
+    "react",
+    "screen-reader",
+    "aria-live",
+    "a11y",
+    "subscriber",
+    "agent"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "test": "vitest",
+    "lint": "tsc --noEmit && eslint src --ext ts,tsx",
+    "preview": "vite preview"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@testing-library/react": "^14.0.0",
+    "jsdom": "^23.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

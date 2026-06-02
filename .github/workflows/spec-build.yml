@@ -1,0 +1,226 @@
+# Spec build workflow.
+#
+# Verifies the website still builds correctly whenever spec, guide, governance,
+# or website source files change. Catches broken markdown, missing files, and
+# internal link rot before merge to main.
+#
+# This is intentionally separate from publish-website.yml so we can test the
+# build on PRs (which shouldn't deploy) without duplicating deploy logic.
+
+name: Spec Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "spec/**"
+      - "guides/**"
+      - "governance/**"
+      - "schemas/**"
+      - "website/**"
+      - ".github/workflows/spec-build.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "spec/**"
+      - "guides/**"
+      - "governance/**"
+      - "schemas/**"
+      - "website/**"
+      - ".github/workflows/spec-build.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+    name: Build website
+    runs-on: ubuntu-latest
+    outputs:
+      total-pages: ${{ steps.summary.outputs.total-pages }}
+      total-size-kb: ${{ steps.summary.outputs.total-size-kb }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install markdown
+
+      - name: Run website build
+        working-directory: website
+        run: ./build.sh --clean
+
+      - name: Verify required output files exist
+        run: |
+          set -e
+          required=(
+            "website/dist/index.html"
+            "website/dist/404.html"
+            "website/dist/styles/main.css"
+            "website/dist/CNAME"
+          )
+          for f in "${required[@]}"; do
+            if [[ ! -f "$f" ]]; then
+              echo "::error::Required output missing: $f"
+              exit 1
+            fi
+            echo "  ✓ $f"
+          done
+
+      - name: Verify rendered chapter count
+        run: |
+          spec_pages=$(find website/dist/spec -name '*.html' 2>/dev/null | wc -l | tr -d ' ')
+          guides_pages=$(find website/dist/guides -name '*.html' 2>/dev/null | wc -l | tr -d ' ')
+          governance_pages=$(find website/dist/governance -name '*.html' 2>/dev/null | wc -l | tr -d ' ')
+          echo "  Spec pages: $spec_pages"
+          echo "  Guides pages: $guides_pages"
+          echo "  Governance pages: $governance_pages"
+          if [[ "$spec_pages" -lt 10 ]]; then
+            echo "::error::Spec chapter count suspiciously low: $spec_pages (expected ≥ 10)"
+            exit 1
+          fi
+          if [[ "$guides_pages" -lt 5 ]]; then
+            echo "::error::Guides count suspiciously low: $guides_pages (expected ≥ 5)"
+            exit 1
+          fi
+
+      - name: Validate generated HTML basic structure
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          errors = 0
+          html_files = list(Path("website/dist").rglob("*.html"))
+          print(f"Checking {len(html_files)} HTML files...")
+          for path in html_files:
+              content = path.read_text(encoding="utf-8")
+              # Every page should have <!DOCTYPE html>, <html lang>, <main>
+              checks = [
+                  ("DOCTYPE", "<!DOCTYPE html>" in content[:50]),
+                  ("lang attribute", 'lang="' in content),
+                  ("title element", "<title>" in content),
+                  ("main landmark", "<main" in content),
+                  ("body element", "<body>" in content),
+              ]
+              page_failed = False
+              for check, ok in checks:
+                  if not ok:
+                      if not page_failed:
+                          print(f"  ✗ {path.relative_to('website/dist')}")
+                          page_failed = True
+                      print(f"      missing: {check}")
+                      errors += 1
+          if errors:
+              print(f"\n  Total structural errors: {errors}")
+              raise SystemExit(1)
+          print(f"  ✓ All {len(html_files)} pages structurally valid")
+          PY
+
+      - name: Check internal link integrity
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          dist = Path("website/dist")
+          all_pages = {str(p.relative_to(dist)) for p in dist.rglob("*.html")}
+          all_pages.add("index.html")
+
+          # Build a set of all paths that exist in dist
+          existing = set()
+          for path in dist.rglob("*"):
+              if path.is_file():
+                  existing.add(str(path.relative_to(dist)))
+                  # Also accept directory-style references resolving to index.html
+                  parent = path.parent.relative_to(dist)
+                  if path.name == "index.html" and str(parent) != ".":
+                      existing.add(str(parent) + "/")
+                      existing.add(str(parent))
+
+          # Find all internal (root-relative) hrefs in HTML files
+          href_pattern = re.compile(r'href="(/[^"#?]*)["#?]')
+          broken = []
+          for html in dist.rglob("*.html"):
+              content = html.read_text(encoding="utf-8")
+              for match in href_pattern.finditer(content):
+                  href = match.group(1).lstrip("/")
+                  if not href:
+                      continue
+                  # Resolve dir-style references
+                  if href.endswith("/"):
+                      candidate = href + "index.html"
+                  else:
+                      candidate = href
+                  # Schemas, mailto:, github links and anchors handled separately
+                  if candidate.startswith(("schemas/", "mailto:")):
+                      continue
+                  if candidate not in existing and href not in existing:
+                      broken.append((html.relative_to(dist), match.group(1)))
+
+          if broken:
+              print(f"  ⚠ {len(broken)} potentially broken internal links found:")
+              # Only show first 15 to keep CI output readable
+              for source, target in broken[:15]:
+                  print(f"      {source} → {target}")
+              if len(broken) > 15:
+                  print(f"      ... and {len(broken) - 15} more")
+              # Don't fail the build on link rot during early development;
+              # mark as warning instead. Tighten to `exit 1` once stable.
+              print("\n  (treating as warning during pre-1.0 phase)")
+          else:
+              print("  ✓ All internal links resolve to existing pages")
+          PY
+
+      - name: Compute build summary
+        id: summary
+        run: |
+          total=$(find website/dist -name '*.html' | wc -l | tr -d ' ')
+          size_kb=$(du -sk website/dist | cut -f1)
+          echo "total-pages=$total" >> "$GITHUB_OUTPUT"
+          echo "total-size-kb=$size_kb" >> "$GITHUB_OUTPUT"
+          echo ""
+          echo "  Total HTML pages: $total"
+          echo "  Total size: ${size_kb} KB"
+
+      - name: Upload dist artifact for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-dist-preview
+          path: website/dist/
+          retention-days: 14
+
+  build-summary:
+    name: Build summary
+    runs-on: ubuntu-latest
+    needs: build
+    if: always()
+    steps:
+      - name: Post summary
+        run: |
+          if [[ "${{ needs.build.result }}" == "success" ]]; then
+            echo "## ✅ Spec build succeeded" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Total HTML pages: ${{ needs.build.outputs.total-pages }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Total size: ${{ needs.build.outputs.total-size-kb }} KB" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Artifact: \`website-dist-preview\` (download from this run)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ❌ Spec build failed" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Check the \`build\` job logs above for the specific error." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi

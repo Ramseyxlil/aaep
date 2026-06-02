@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aaep-ext-medical-hipaa"
+version = "1.0.0"
+description = "HIPAA-aware AAEP extension for healthcare contexts: PHI redaction, BAA capability negotiation, medical risk classification, HL7-aligned audit metadata"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Abdulrafiu Izuafa", email = "Abdulrafiu@izusoft.tech" },
+]
+keywords = [
+    "aaep",
+    "accessibility",
+    "healthcare",
+    "hipaa",
+    "phi",
+    "redaction",
+    "audit",
+    "hl7",
+    "clinical",
+    "extension",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+]
+
+dependencies = [
+    "aaep-minimal-producer>=1.0.0",
+]
+
+[project.optional-dependencies]
+# For production-grade de-identification, install one of these alongside.
+# We do not require them because they are heavy dependencies.
+presidio = [
+    "presidio-analyzer>=2.2.0",
+    "presidio-anonymizer>=2.2.0",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.3.0",
+    "jsonschema>=4.20.0",
+]
+
+[project.urls]
+Homepage = "https://aaep-protocol.org/extensions/medical-hipaa/"
+Repository = "https://github.com/Ramseyxlil/aaep"
+"Bug Tracker" = "https://github.com/Ramseyxlil/aaep/issues"
+"HIPAA Resources" = "https://www.hhs.gov/hipaa/for-professionals/index.html"
+"HL7 Purpose of Use" = "https://terminology.hl7.org/CodeSystem-v3-PurposeOfUse.html"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aaep_ext_medical_hipaa*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+aaep_ext_medical_hipaa = ["../risk_table.json", "../extension.json"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-v", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]

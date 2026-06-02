@@ -1,0 +1,81 @@
+{
+  "name": "aaep-typescript-producer",
+  "version": "1.0.0",
+  "description": "AAEP producer example in TypeScript / Node.js — manual loop pattern with full safety machinery",
+  "keywords": [
+    "aaep",
+    "accessibility",
+    "agent",
+    "typescript",
+    "nodejs",
+    "screen-reader",
+    "assistive-technology"
+  ],
+  "homepage": "https://aaep-protocol.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ramseyxlil/aaep.git",
+    "directory": "examples/producers/typescript-minimal"
+  },
+  "bugs": {
+    "url": "https://github.com/Ramseyxlil/aaep/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Abdulrafiu Izuafa",
+    "email": "Abdulrafiu@izusoft.tech",
+    "url": "https://aaep-protocol.org"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./emitter": {
+      "types": "./dist/emitter.d.ts",
+      "import": "./dist/emitter.js"
+    },
+    "./agent": {
+      "types": "./dist/agent.d.ts",
+      "import": "./dist/agent.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "aaep-ts-server": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "demo": "tsx src/agent.ts",
+    "server": "tsx src/server.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

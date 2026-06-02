@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.handoff.requested.schema.json",
+  "title": "AAEP Event: agent.handoff.requested",
+  "description": "Indicates that the producer is unable to complete the session and is requesting handoff to a human, a specialist agent, or an escalation queue. Typically appears near the end of a session; the producer often follows up with agent.session.completed or agent.session.cancelled once the handoff is acknowledged. MUST be emitted with urgency='critical'. Defined normatively in Chapter 4 §4.4.3 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "reason", "target_kind"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.handoff.requested'.",
+      "const": "aaep:agent.handoff.requested"
+    },
+    "urgency": {
+      "description": "MUST be 'critical'. Handoff events represent the producer's surrender of the session and MUST be surfaced promptly.",
+      "const": "critical"
+    },
+    "reason": {
+      "description": "Why the handoff is being requested. Should explain the limitation the producer encountered. Example: 'Customer's tax situation is unusual and requires human financial advisor review.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "target_kind": {
+      "description": "What kind of entity should receive the handoff. 'human' = a human agent or operator; 'specialist_agent' = another AI agent with relevant specialization; 'escalation_queue' = a named queue or workflow that will route the handoff appropriately.",
+      "type": "string",
+      "enum": ["human", "specialist_agent", "escalation_queue"]
+    },
+    "target_uri": {
+      "description": "URI identifying the specific handoff destination. May be a queue URI (e.g., 'queue://customer-service/financial-advisor'), a specialist agent endpoint, or a workflow trigger.",
+      "type": "string",
+      "format": "uri"
+    },
+    "packaged_context": {
+      "description": "Structured summary of the session for the handoff target. Format is producer-defined. Typically includes the user's original request, key decisions made, tools invoked, and the outstanding question or issue.",
+      "type": "object"
+    },
+    "urgency_for_handoff": {
+      "description": "How urgently the handoff target should attend to this handoff. Distinct from the event's transport urgency (which is always 'critical' for handoff events). This field describes the business urgency the receiving party should apply.",
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "summary_terse": {
+      "description": "Brief form. Example: 'Handing off to a human.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Standard form combining reason and target. Example: 'Your situation needs review by a human financial advisor. I am handing this off to one of our specialists.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed form, possibly listing what was attempted and why the handoff is needed.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.handoff.requested",
+      "event_id": "evt_4d8a1c7f3e9b2a5d",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:35.211Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "reason": "Customer's tax situation requires human financial advisor review.",
+      "target_kind": "human"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.handoff.requested",
+      "event_id": "evt_4d8a1c7f3e9b2a5d",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:35.211Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "reason": "Customer's tax situation is unusual and requires human financial advisor review.",
+      "target_kind": "human",
+      "target_uri": "queue://customer-service/financial-advisor",
+      "urgency_for_handoff": "medium",
+      "packaged_context": {
+        "user_request_summary": "Retirement planning for self-employed customer with multiple LLCs.",
+        "tools_invoked": ["fetch_balance", "calculate_projection"],
+        "outstanding_question": "Optimal Solo 401k contribution given pass-through income from three LLCs.",
+        "session_duration_ms": 24000
+      },
+      "summary_terse": "Handing off to a human.",
+      "summary_normal": "Your situation needs review by a human financial advisor. I am handing this off to one of our specialists."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.handoff.requested",
+      "event_id": "evt_4d8a1c7f3e9b2a5e",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T15:01:22.118Z",
+      "producer": {
+        "agent_id": "general-support",
+        "agent_version": "2.5.0"
+      },
+      "urgency": "critical",
+      "reason": "Question requires database administration expertise beyond my training.",
+      "target_kind": "specialist_agent",
+      "target_uri": "agent://specialists/database-admin",
+      "urgency_for_handoff": "low",
+      "packaged_context": {
+        "user_request_summary": "Recover deleted records from yesterday's backup.",
+        "context_so_far": "User accidentally deleted production records. General support cannot perform database recovery."
+      },
+      "summary_normal": "Routing your request to our database administration specialist."
+    }
+  ]
+}

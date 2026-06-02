@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/handshake/subscription.request.schema.json",
+  "title": "AAEP Message: subscription.request",
+  "description": "The first message of the subscription handshake, sent from subscriber to producer. Carries the subscriber's identity and capability declaration. The producer responds with subscription.accepted or subscription.rejected. Required at Conformance Level 3. Defined normatively in Chapter 5 §5.2-§5.3 of the AAEP specification.",
+
+  "type": "object",
+  "required": ["type", "aaep_version", "subscriber_id", "capabilities"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'subscription.request'.",
+      "const": "subscription.request"
+    },
+    "aaep_version": {
+      "description": "The AAEP version the subscriber is requesting. Producer may negotiate down via subscription.accepted or reject via subscription.rejected.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$",
+      "examples": ["1.0.0", "0.1.0-draft"]
+    },
+    "subscriber_id": {
+      "description": "Stable identifier for the subscriber. Like producer.agent_id but for the subscriber side.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "examples": [
+        "windows-narrator",
+        "nvda-screen-reader",
+        "voiceover-macos",
+        "talkback-android",
+        "com.example.captioning-service"
+      ]
+    },
+    "subscriber_name": {
+      "description": "Human-readable name and version. Example: 'Windows Narrator 11.2'",
+      "type": "string",
+      "maxLength": 256
+    },
+    "subscriber_version": {
+      "description": "Version string of the subscriber software.",
+      "type": "string",
+      "maxLength": 64
+    },
+    "subscriber_manifest_uri": {
+      "description": "Optional URI to the subscriber's published manifest, describing what the subscriber can do beyond the inline capabilities declaration.",
+      "type": "string",
+      "format": "uri"
+    },
+    "correlation_id": {
+      "description": "Optional trace identifier for logging across producer and subscriber observability systems.",
+      "type": "string"
+    },
+    "capabilities": {
+      "description": "The subscriber's capability declaration. Shapes the event stream the producer will emit on this subscription. Empty object {} is permitted and produces default behavior.",
+      "type": "object",
+      "properties": {
+        "max_events_per_second": {
+          "description": "Maximum sustained rate at which the subscriber can process incoming events. Critical events bypass this limit. Default behavior if absent: no rate limit.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "preferred_verbosity": {
+          "description": "Subscriber's preferred verbosity level. Default 'normal' if absent.",
+          "type": "string",
+          "enum": ["terse", "normal", "detailed"],
+          "default": "normal"
+        },
+        "languages": {
+          "description": "BCP 47 language tags the subscriber can announce, in preference order. Default ['en-US'] if absent.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "default": ["en-US"]
+        },
+        "supports_confirmation_reply": {
+          "description": "Whether the subscriber can deliver confirmation replies. Subscribers claiming Conformance Level 2+ MUST declare this true.",
+          "type": "boolean",
+          "default": false
+        },
+        "supports_clarification_reply": {
+          "description": "Whether the subscriber can deliver clarification replies.",
+          "type": "boolean",
+          "default": false
+        },
+        "coalesce_boundaries": {
+          "description": "Boundaries at which the subscriber wishes streaming output to be coalesced. Default ['sentence', 'completion'] if absent.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["none", "word", "sentence", "paragraph", "completion"]
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "default": ["sentence", "completion"]
+        },
+        "event_filters": {
+          "description": "Patterns of event types the subscriber wishes to receive or suppress. Critical events bypass filters. Default: include all aaep:agent.*.",
+          "type": "object",
+          "properties": {
+            "include": {
+              "description": "Event type patterns to include. Patterns may be exact types or wildcards (e.g., 'aaep:agent.tool.*').",
+              "type": "array",
+              "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "uniqueItems": true
+            },
+            "exclude": {
+              "description": "Event type patterns to exclude. Takes precedence over include.",
+              "type": "array",
+              "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "supported_conformance_levels": {
+          "description": "Conformance levels the subscriber implements. Default [1] if absent.",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "enum": [1, 2, 3]
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "default": [1]
+        },
+        "supported_extensions": {
+          "description": "Extension vocabulary URIs the subscriber implements. Producers MAY emit extension data targeting these vocabularies.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 64,
+          "uniqueItems": true,
+          "default": []
+        },
+        "cognitive_load": {
+          "description": "Cognitive load mode the user has configured. Affects producer adaptation of verbosity and event volume.",
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "default": "medium"
+        },
+        "pace_wpm": {
+          "description": "Subscriber's announcement pace in words per minute. Producer uses this hint to estimate timing for coalescing.",
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 1000
+        },
+        "accept_signed_manifests_only": {
+          "description": "Whether the subscriber requires the producer's manifest to be cryptographically signed (Level 3 conformance).",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": {
+        "description": "Extension-namespaced capability objects. Keys are extension prefixes declared elsewhere in the system; values are objects whose schema is defined by the extension.",
+        "type": "object"
+      }
+    },
+    "extensions": {
+      "description": "Optional namespaced object carrying extension fields at the message level (distinct from extension capabilities inside the `capabilities` object).",
+      "type": "object",
+      "additionalProperties": { "type": "object" }
+    }
+  },
+
+  "additionalProperties": false,
+
+  "examples": [
+    {
+      "type": "subscription.request",
+      "aaep_version": "1.0.0",
+      "subscriber_id": "test-subscriber",
+      "capabilities": {}
+    },
+    {
+      "type": "subscription.request",
+      "aaep_version": "1.0.0",
+      "subscriber_id": "windows-narrator",
+      "subscriber_name": "Windows Narrator 11.2",
+      "subscriber_version": "11.2.5621.0",
+      "capabilities": {
+        "max_events_per_second": 3,
+        "preferred_verbosity": "normal",
+        "languages": ["en-US"],
+        "supports_confirmation_reply": true,
+        "supports_clarification_reply": true,
+        "coalesce_boundaries": ["sentence", "completion"],
+        "supported_conformance_levels": [1, 2]
+      }
+    },
+    {
+      "type": "subscription.request",
+      "aaep_version": "1.0.0",
+      "subscriber_id": "azurelearn-multilingual-bridge",
+      "subscriber_name": "AzureLearn AI Multilingual Subscriber",
+      "subscriber_version": "0.3.0",
+      "capabilities": {
+        "max_events_per_second": 5,
+        "preferred_verbosity": "normal",
+        "languages": ["yo-NG", "ha-NG", "ig-NG", "en-NG", "en-US"],
+        "supports_confirmation_reply": true,
+        "supports_clarification_reply": true,
+        "coalesce_boundaries": ["sentence", "paragraph", "completion"],
+        "event_filters": {
+          "include": ["aaep:agent.*"],
+          "exclude": ["aaep:agent.progress.updated"]
+        },
+        "supported_conformance_levels": [1, 2, 3],
+        "supported_extensions": [
+          "https://aaep-protocol.org/extensions/multilingual-african-languages/v1"
+        ],
+        "cognitive_load": "medium",
+        "pace_wpm": 180,
+        "accept_signed_manifests_only": false,
+        "azlearn": {
+          "tonal_marks": true,
+          "transliteration": "native"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.awaiting.confirmation",
+  "event_id": "evt_b7c4e9a2f5d1a8c3",
+  "session_id": "sess_2c91a7b4d23f1e88",
+  "sequence_number": 11,
+  "timestamp": "2026-06-30T14:22:20.014Z",
+  "producer": {
+    "agent_id": "banking-assistant",
+    "agent_version": "3.0.1"
+  },
+  "urgency": "critical",
+  "action": "Transfer $500.00 from checking-7821 to savings-3344.",
+  "consequence": "Funds move immediately. Reversal requires bank intervention and takes 3 to 5 business days.",
+  "reply_token": "rpl_4f8a2e7d9c1b6a3f",
+  "timeout_seconds": 300,
+  "default_decision": "reject",
+  "risk_level": "high",
+  "irreversible": true,
+  "reversibility": "reversible_with_effort",
+  "summary_terse": "Confirm transfer?",
+  "summary_normal": "Confirmation required. Transfer $500 from checking to savings. Cannot be easily reversed."
+}

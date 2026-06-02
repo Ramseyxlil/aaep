@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.session.errored.schema.json",
+  "title": "AAEP Event: agent.session.errored",
+  "description": "Announces that the session ended due to an error. MUST be emitted with urgency 'critical'. Defined normatively in Chapter 4 §4.1.3 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "error_category", "summary_normal"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.session.errored'.",
+      "const": "aaep:agent.session.errored"
+    },
+    "urgency": {
+      "description": "MUST be 'critical' for errored sessions. Subscribers MUST announce errors promptly and MUST NOT suppress them under backpressure.",
+      "const": "critical"
+    },
+    "error_category": {
+      "description": "Normative categorization of the error. Determines how subscribers might surface remediation to the user.",
+      "type": "string",
+      "enum": ["transient", "permanent", "requires_user", "unknown"]
+    },
+    "summary_normal": {
+      "description": "Human-readable description of the error suitable for direct announcement to the user. Required.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_terse": {
+      "description": "Shorter form for terse verbosity. Example: 'Tool timed out.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_detailed": {
+      "description": "Longer form with technical context, possibly including stack trace summary or operational hints.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "error_code": {
+      "description": "Producer-defined short error code. Conventionally uppercase with underscores. Useful for log indexing and automated triage.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{1,63}$",
+      "examples": ["AUTH_FAILED", "TOOL_TIMEOUT", "RATE_LIMITED", "INVALID_INPUT"]
+    },
+    "error_uri": {
+      "description": "URI to documentation or remediation guidance for this specific error. Subscribers MAY surface a 'Learn more' affordance pointing to this URI.",
+      "type": "string",
+      "format": "uri"
+    },
+    "recoverable": {
+      "description": "Whether the session could plausibly succeed if retried. Distinct from error_category: a transient error is recoverable by retry; a requires_user error is recoverable only after user action.",
+      "type": "boolean"
+    },
+    "remediation_hint": {
+      "description": "Plain-language suggestion of how the user might address the issue. Subscribers SHOULD include this in announcements when present.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.errored",
+      "event_id": "evt_3a8f9b21c5e7d4f2",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:25.115Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "error_category": "transient",
+      "summary_normal": "The financial data service did not respond in time. Please try again."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.errored",
+      "event_id": "evt_3a8f9b21c5e7d4f2",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:25.115Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "error_category": "transient",
+      "error_code": "TOOL_TIMEOUT",
+      "summary_terse": "Tool timed out.",
+      "summary_normal": "The financial data service did not respond in time. Please try again.",
+      "summary_detailed": "The fetch_balance tool timed out after 10 seconds connecting to the financial data service. This is usually a temporary issue.",
+      "recoverable": true,
+      "remediation_hint": "Try the request again in a few moments.",
+      "error_uri": "https://docs.example.com/errors/TOOL_TIMEOUT"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.errored",
+      "event_id": "evt_3a8f9b21c5e7d4f3",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T14:25:01.422Z",
+      "producer": {
+        "agent_id": "clinical-assistant",
+        "agent_version": "2.1.0"
+      },
+      "urgency": "critical",
+      "error_category": "requires_user",
+      "error_code": "AUTH_EXPIRED",
+      "summary_terse": "Sign in again.",
+      "summary_normal": "Your authentication has expired. Please sign in again to continue.",
+      "recoverable": true,
+      "remediation_hint": "Sign in to your account, then re-issue your request."
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/handshake/clarification.reply.schema.json",
+  "title": "AAEP Message: clarification.reply",
+  "description": "Subscriber's reply to an agent.awaiting.clarification event. Conveys the user's clarification response. The response field is polymorphic: its type depends on the accepted_response_kinds of the originating event (string for freetext or multiple_choice, boolean for yes_no, number for numeric). Like confirmation.reply, this message is single-use per reply_token. Defined normatively in Chapter 6 §6.5 of the AAEP specification.",
+
+  "type": "object",
+  "required": ["type", "reply_token", "response", "subscription_id", "timestamp"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'clarification.reply'.",
+      "const": "clarification.reply"
+    },
+    "reply_token": {
+      "description": "The exact reply_token from the originating agent.awaiting.clarification event. Subscribers MUST echo this token verbatim.",
+      "type": "string",
+      "pattern": "^rpl_[A-Za-z0-9]{1,64}$"
+    },
+    "response": {
+      "description": "The user's clarification response. Type is determined by the originating event's accepted_response_kinds: string for 'freetext' or 'multiple_choice', boolean for 'yes_no', number for 'numeric'. For multiple_choice, the value MUST match one of the values listed in the originating event's choices array.",
+      "oneOf": [
+        {
+          "description": "Freetext response or multiple_choice value.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384
+        },
+        {
+          "description": "Yes/no response.",
+          "type": "boolean"
+        },
+        {
+          "description": "Numeric response.",
+          "type": "number"
+        }
+      ]
+    },
+    "subscription_id": {
+      "description": "The subscription on which this reply is sent.",
+      "type": "string",
+      "pattern": "^sub_[A-Za-z0-9]{1,64}$"
+    },
+    "timestamp": {
+      "description": "RFC 3339 timestamp of when the user provided the clarification. Used by the producer to verify timeout compliance.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "decided_by": {
+      "description": "Identifier of the user who provided the clarification.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "examples": [
+        "user:folake",
+        "user:abdulrafiu"
+      ]
+    },
+    "confidence": {
+      "description": "Subscriber-reported confidence in the clarification, between 0 and 1. Useful for voice-input subscribers where speech recognition may have uncertainty.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "correlation_id": {
+      "description": "Optional trace identifier for cross-system correlation.",
+      "type": "string"
+    }
+  },
+
+  "additionalProperties": false,
+
+  "examples": [
+    {
+      "type": "clarification.reply",
+      "reply_token": "rpl_2c8e4a9f7b1d3a6e",
+      "response": "67",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:18.121Z",
+      "decided_by": "user:folake"
+    },
+    {
+      "type": "clarification.reply",
+      "reply_token": "rpl_3d9f5a8e2b1c4f7d",
+      "response": "I want to retire at 67 because I expect to receive full Social Security benefits at that age.",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:22:35.412Z",
+      "decided_by": "user:folake"
+    },
+    {
+      "type": "clarification.reply",
+      "reply_token": "rpl_4a8c2b9d6e3f5a1c",
+      "response": true,
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:23:01.882Z",
+      "decided_by": "user:folake"
+    },
+    {
+      "type": "clarification.reply",
+      "reply_token": "rpl_5e9d3b8c1a4f6e2d",
+      "response": 1200,
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:23:45.221Z",
+      "decided_by": "user:folake"
+    },
+    {
+      "type": "clarification.reply",
+      "reply_token": "rpl_6f0e4c9d2b5a7f3e",
+      "response": "Database recovery option 2",
+      "subscription_id": "sub_8a4f2c9d1e7b5f3a",
+      "timestamp": "2026-05-24T14:25:01.422Z",
+      "decided_by": "user:dbadmin-on-call",
+      "confidence": 0.87
+    }
+  ]
+}

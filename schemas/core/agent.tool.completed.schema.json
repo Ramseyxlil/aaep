@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.tool.completed.schema.json",
+  "title": "AAEP Event: agent.tool.completed",
+  "description": "Announces that a previously-invoked tool has returned (successfully or with an error). MUST be emitted after the matching agent.tool.invoked, with the same `tool` value and (if used) matching `tool_call_id`. Producers MUST emit this event even on timeout rather than silently abandon the tool. Defined normatively in Chapter 4 §4.3.2 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "tool", "status"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.tool.completed'.",
+      "const": "aaep:agent.tool.completed"
+    },
+    "tool": {
+      "description": "The tool that completed. MUST match the `tool` value from the preceding agent.tool.invoked event.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.-]{0,255}$"
+    },
+    "status": {
+      "description": "Outcome of the tool invocation. 'success' if the tool returned normally; 'error' if the tool raised or returned an explicit error; 'timeout' if the tool was abandoned because it did not return in the configured time.",
+      "type": "string",
+      "enum": ["success", "error", "timeout"]
+    },
+    "tool_call_id": {
+      "description": "Correlator matching the `tool_call_id` of the preceding agent.tool.invoked event. Recommended when multiple concurrent tools may be invoked, required for unambiguous pairing.",
+      "type": "string",
+      "pattern": "^call_[A-Za-z0-9]{1,64}$"
+    },
+    "duration_ms": {
+      "description": "Actual elapsed time of the tool call in milliseconds. Subscribers MAY use this to detect tools that consistently take longer than `expected_duration_ms`.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    },
+    "summary_terse": {
+      "description": "Terse description of the result. Example: 'Got balance.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Normal description of the result, possibly including key result values.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed description, possibly including formatted result data.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "error_message": {
+      "description": "Brief error description. Required in practice (though not by schema) when status is 'error' or 'timeout'.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.completed",
+      "event_id": "evt_1b7a4f2c9e3d6a8f",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:16.412Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "fetch_balance",
+      "status": "success"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.completed",
+      "event_id": "evt_1b7a4f2c9e3d6a8f",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:16.412Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "fetch_balance",
+      "tool_call_id": "call_7a2b9c4e",
+      "status": "success",
+      "duration_ms": 1885,
+      "summary_terse": "Got balance.",
+      "summary_normal": "Balance: $12,500.00.",
+      "summary_detailed": "Retrieved checking account balance of $12,500.00 as of 2026-05-24 14:22:16."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.completed",
+      "event_id": "evt_1b7a4f2c9e3d6a90",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:26.501Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "calculate_projection",
+      "tool_call_id": "call_8b3c0d5f",
+      "status": "error",
+      "duration_ms": 421,
+      "summary_terse": "Calc failed.",
+      "summary_normal": "Could not calculate projection: missing required input.",
+      "error_message": "Required parameter 'retirement_age' was not provided."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.tool.completed",
+      "event_id": "evt_1b7a4f2c9e3d6a91",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:36.501Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "tool": "external_market_api",
+      "tool_call_id": "call_9c4d1e6f",
+      "status": "timeout",
+      "duration_ms": 10000,
+      "summary_normal": "Market data service did not respond within 10 seconds.",
+      "error_message": "Timed out waiting for response from external_market_api."
+    }
+  ]
+}

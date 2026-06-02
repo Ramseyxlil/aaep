@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.awaiting.clarification.schema.json",
+  "title": "AAEP Event: agent.awaiting.clarification",
+  "description": "Pauses the producer pending free-form clarification from the user. Distinct from agent.awaiting.confirmation: clarification does not authorize a specific action, it gathers information the producer needs to proceed. The producer MUST block its own progress (on dependent work) until a reply arrives or timeout_seconds elapses. MUST be emitted with urgency='critical'. Defined normatively in Chapter 4 §4.4.2 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "question", "reply_token", "timeout_seconds"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.awaiting.clarification'.",
+      "const": "aaep:agent.awaiting.clarification"
+    },
+    "urgency": {
+      "description": "MUST be 'critical'. Subscribers MUST surface clarification requests with appropriate prominence.",
+      "const": "critical"
+    },
+    "question": {
+      "description": "The clarification question. Should be unambiguous and answerable without additional context.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "reply_token": {
+      "description": "Opaque correlation token. MUST be echoed by the subscriber in the matching clarification.reply message. Single-use; once consumed, the producer rejects subsequent replies with this token.",
+      "type": "string",
+      "pattern": "^rpl_[A-Za-z0-9]{1,64}$"
+    },
+    "timeout_seconds": {
+      "description": "Seconds after which the producer treats clarification as unavailable. Producer MAY apply default_response if set, otherwise SHOULD escalate or terminate the session.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400
+    },
+    "summary_terse": {
+      "description": "Brief form of the question. Example: 'Retirement age?'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Standard form. Often the question itself, possibly with light context.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed form including why this clarification is needed and what the answer affects.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "accepted_response_kinds": {
+      "description": "Kinds of responses the producer can process. Subscribers select an appropriate input method based on these. Subscribers MAY present multiple input methods if multiple kinds are listed.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["freetext", "yes_no", "multiple_choice", "numeric"]
+      },
+      "minItems": 1,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "choices": {
+      "description": "Required when accepted_response_kinds includes 'multiple_choice'. List of structured options. Subscribers present these as selectable items.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["value", "label"],
+        "properties": {
+          "value": {
+            "description": "The value the subscriber returns in the reply if this choice is selected. Producer-defined.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "label": {
+            "description": "Human-readable label shown to the user for this choice.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 32,
+      "uniqueItems": true
+    },
+    "context": {
+      "description": "Why the producer needs this clarification. Helps the user provide a useful answer.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "default_response": {
+      "description": "Producer's fallback if no clarification arrives in time. Format depends on accepted_response_kinds; subscribers do not interpret this field.",
+      "type": "string",
+      "maxLength": 4096
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.clarification",
+      "event_id": "evt_a3c9f2e7b1d8a4c6",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:12.890Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "question": "Which retirement age should I plan for?",
+      "reply_token": "rpl_2c8e4a9f7b1d3a6e",
+      "timeout_seconds": 300
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.clarification",
+      "event_id": "evt_a3c9f2e7b1d8a4c6",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:12.890Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "critical",
+      "question": "Which retirement age should I plan for?",
+      "reply_token": "rpl_2c8e4a9f7b1d3a6e",
+      "timeout_seconds": 300,
+      "accepted_response_kinds": ["multiple_choice", "numeric"],
+      "choices": [
+        { "value": "60", "label": "Age 60" },
+        { "value": "65", "label": "Age 65 (standard)" },
+        { "value": "67", "label": "Age 67 (full Social Security)" },
+        { "value": "70", "label": "Age 70 (maximum benefits)" }
+      ],
+      "context": "Different retirement ages substantially change required savings.",
+      "default_response": "65",
+      "summary_terse": "Retirement age?",
+      "summary_normal": "Which retirement age should I plan for?"
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.awaiting.clarification",
+      "event_id": "evt_a3c9f2e7b1d8a4c7",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T14:35:42.111Z",
+      "producer": {
+        "agent_id": "support-agent",
+        "agent_version": "3.0.1"
+      },
+      "urgency": "critical",
+      "question": "Could you describe what you were trying to do when the error appeared?",
+      "reply_token": "rpl_5d8f1a2c9e3b6a4d",
+      "timeout_seconds": 180,
+      "accepted_response_kinds": ["freetext"],
+      "context": "I have a few possible explanations and need to know which matches your situation."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.session.started",
+  "event_id": "evt_invalid001"
+}

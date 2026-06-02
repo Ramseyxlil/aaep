@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.session.completed.schema.json",
+  "title": "AAEP Event: agent.session.completed",
+  "description": "Announces successful completion of an agent session. MUST be the last event of a session that completed successfully. Defined normatively in Chapter 4 §4.1.2 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "summary_normal"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.session.completed'.",
+      "const": "aaep:agent.session.completed"
+    },
+    "summary_normal": {
+      "description": "Human-readable description of what the session accomplished. Required.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_terse": {
+      "description": "Shorter form for terse verbosity. Often a single word or short phrase like 'Done.' or 'Plan ready.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_detailed": {
+      "description": "Longer form with more context, possibly including key results.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "duration_ms": {
+      "description": "Actual session duration in milliseconds, measured from agent.session.started to agent.session.completed.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    },
+    "tool_invocations_count": {
+      "description": "Number of tools the agent invoked during this session. Useful for subscribers that summarize session activity.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "output_summary": {
+      "description": "Brief summary of the final output produced. Distinct from summary_normal: this describes what was produced, not what the session did.",
+      "type": "string",
+      "maxLength": 16384
+    },
+    "result_uri": {
+      "description": "URI to a richer representation of the result, if applicable. May be a deep link to a generated document, a database record, or a file.",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.completed",
+      "event_id": "evt_4f7d9c12ab8e3f5a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:38.921Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "summary_normal": "Retirement plan complete. Ready to review."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.completed",
+      "event_id": "evt_4f7d9c12ab8e3f5a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:38.921Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2",
+        "agent_name": "Retirement Planning Assistant"
+      },
+      "urgency": "normal",
+      "summary_terse": "Done.",
+      "summary_normal": "Retirement plan complete. Ready to review.",
+      "summary_detailed": "Retirement plan generation complete in 27 seconds. Plan covers projected savings, recommended monthly contributions, and tax-advantaged account allocations for the next 30 years.",
+      "duration_ms": 27579,
+      "tool_invocations_count": 4,
+      "output_summary": "Generated a 5-section retirement plan with projections and recommendations.",
+      "result_uri": "https://example.com/plans/retirement-folake-2026-05-24"
+    }
+  ]
+}

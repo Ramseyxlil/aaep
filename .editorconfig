@@ -1,0 +1,227 @@
+# AAEP Repository — EditorConfig
+# ==============================
+# EditorConfig helps maintain consistent coding styles for multiple
+# developers working on the same project across various editors and
+# IDEs. This file is automatically respected by most modern editors;
+# some require an EditorConfig plugin.
+#
+# More info: https://editorconfig.org/
+#
+# This configuration covers every language and file type used in the
+# AAEP repository. When contributors clone the repo, their editor
+# automatically applies the correct indentation, line endings, and
+# encoding without manual configuration.
+
+# Top-most EditorConfig file
+root = true
+
+# ---------------------------------------------------------------------------
+# Defaults for all files
+# ---------------------------------------------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# ---------------------------------------------------------------------------
+# Markdown
+# Trailing whitespace is significant in Markdown (two trailing spaces
+# create a line break), so we do not trim it.
+# ---------------------------------------------------------------------------
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Spec chapter files are prose-heavy and benefit from soft wrapping
+# in editors that support it.
+[spec/**.md]
+max_line_length = off
+
+# Implementer's Guide and other guides are also prose
+[guides/**.md]
+max_line_length = off
+
+# ---------------------------------------------------------------------------
+# Python (conformance suite, Python examples, CLI tools)
+# Follows PEP 8: 4-space indentation, line length 88-100 chars
+# ---------------------------------------------------------------------------
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+[*.pyi]
+indent_size = 4
+max_line_length = 100
+
+# Python project metadata
+[pyproject.toml]
+indent_size = 4
+
+[requirements*.txt]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# JavaScript / TypeScript (web subscribers, TS examples, website)
+# 2-space indentation per common Node.js / React conventions
+# ---------------------------------------------------------------------------
+[*.{js,jsx,mjs,cjs}]
+indent_size = 2
+max_line_length = 100
+
+[*.{ts,tsx}]
+indent_size = 2
+max_line_length = 100
+
+[package.json]
+indent_size = 2
+
+[package-lock.json]
+indent_size = 2
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[tsconfig*.json]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# JSON, JSON Schema, JSON-LD
+# 2-space indentation per JSON conventions
+# ---------------------------------------------------------------------------
+[*.{json,jsonld,jsonc}]
+indent_size = 2
+max_line_length = off
+
+# Schema files are auto-generated/validated; keep them clean
+[schemas/**.json]
+indent_size = 2
+max_line_length = off
+
+# ---------------------------------------------------------------------------
+# YAML (GitHub Actions, CITATION.cff, OpenAPI, config files)
+# YAML requires consistent indentation; 2 spaces is universal convention
+# ---------------------------------------------------------------------------
+[*.{yml,yaml}]
+indent_size = 2
+max_line_length = off
+
+[.github/**.yml]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# C# / .NET (csharp-minimal example)
+# Microsoft default style: 4-space indentation
+# ---------------------------------------------------------------------------
+[*.{cs,csx,vb}]
+indent_size = 4
+max_line_length = 120
+
+[*.{csproj,vbproj,fsproj,proj,projitems,shproj,props,targets}]
+indent_size = 2
+
+[*.sln]
+indent_style = tab
+
+# ---------------------------------------------------------------------------
+# Go (go-minimal example)
+# Go style enforced by gofmt: tabs for indentation, no max line length
+# ---------------------------------------------------------------------------
+[*.go]
+indent_style = tab
+indent_size = 4
+max_line_length = off
+
+[go.mod]
+indent_style = tab
+
+[go.sum]
+indent_style = tab
+trim_trailing_whitespace = false
+
+# ---------------------------------------------------------------------------
+# Rust (rust-minimal example)
+# Rust style enforced by rustfmt: 4-space indentation
+# ---------------------------------------------------------------------------
+[*.rs]
+indent_size = 4
+max_line_length = 100
+
+[Cargo.toml]
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Shell scripts
+# Google Shell Style Guide: 2-space indentation
+# ---------------------------------------------------------------------------
+[*.{sh,bash,zsh,fish}]
+indent_size = 2
+max_line_length = 100
+
+# ---------------------------------------------------------------------------
+# Makefiles
+# Make REQUIRES tabs for recipe indentation; cannot be changed.
+# ---------------------------------------------------------------------------
+[{Makefile,makefile,*.mk}]
+indent_style = tab
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# HTML, CSS, SCSS (website)
+# ---------------------------------------------------------------------------
+[*.{html,htm}]
+indent_size = 2
+max_line_length = off
+
+[*.{css,scss,sass,less}]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Configuration and metadata files
+# ---------------------------------------------------------------------------
+[*.{ini,cfg,conf}]
+indent_size = 4
+
+[.gitconfig]
+indent_style = tab
+
+[*.toml]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# CFF (Citation File Format) — used in CITATION.cff
+# Treated as YAML
+# ---------------------------------------------------------------------------
+[*.cff]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Documentation source for the website
+# Jekyll/Hugo/MkDocs files
+# ---------------------------------------------------------------------------
+[*.{njk,liquid,j2}]
+indent_size = 2
+
+[_config.{yml,yaml,toml}]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Generated and vendored files: do not modify in editor
+# Most editors respect these hints and avoid auto-reformatting
+# ---------------------------------------------------------------------------
+[{LICENSE*,NOTICE,CHANGELOG.md}]
+max_line_length = off
+
+# Conformance test fixtures are valid AAEP events; do not auto-reformat
+[conformance/fixtures/**.json]
+indent_size = 2
+trim_trailing_whitespace = false
+
+# ---------------------------------------------------------------------------
+# Binary files (no text rules apply, but listed for clarity)
+# ---------------------------------------------------------------------------
+[*.{png,jpg,jpeg,gif,ico,svg,pdf,zip,tar,gz,woff,woff2,ttf,otf,eot}]
+insert_final_newline = false
+trim_trailing_whitespace = false

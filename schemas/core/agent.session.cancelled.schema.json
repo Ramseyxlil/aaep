@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.session.cancelled.schema.json",
+  "title": "AAEP Event: agent.session.cancelled",
+  "description": "Announces that the session was cancelled before completion. Cancellation may originate from the user, the producer itself, a timeout, or an external system. Defined normatively in Chapter 4 §4.1.4 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "cancelled_by", "summary_normal"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.session.cancelled'.",
+      "const": "aaep:agent.session.cancelled"
+    },
+    "cancelled_by": {
+      "description": "Source of the cancellation. Determines how subscribers might frame the announcement to the user.",
+      "type": "string",
+      "enum": ["user", "producer", "timeout", "system"]
+    },
+    "summary_normal": {
+      "description": "Human-readable description of why the cancellation occurred. Required.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_terse": {
+      "description": "Shorter form. Example: 'Cancelled.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_detailed": {
+      "description": "Longer form with additional context about the cancellation.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "cancellation_reason": {
+      "description": "Producer-specific reason code for the cancellation. Conventionally a short snake_case identifier.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,63}$",
+      "examples": [
+        "user_pressed_escape",
+        "user_closed_window",
+        "timeout_exceeded",
+        "agent_determined_unnecessary",
+        "external_signal_received",
+        "policy_violation_detected"
+      ]
+    },
+    "partial_result": {
+      "description": "Brief description of any partial work produced before cancellation. Helps users decide whether to retry from scratch or resume.",
+      "type": "string",
+      "maxLength": 16384
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.cancelled",
+      "event_id": "evt_6c2e8a1f4d7b3a9c",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:18.450Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "cancelled_by": "user",
+      "summary_normal": "Cancelled at your request."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.cancelled",
+      "event_id": "evt_6c2e8a1f4d7b3a9c",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:18.450Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "normal",
+      "cancelled_by": "user",
+      "cancellation_reason": "user_pressed_escape",
+      "summary_terse": "Cancelled.",
+      "summary_normal": "Retirement plan generation cancelled at your request.",
+      "partial_result": "Initial projection was drafted but no recommendations were generated."
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.session.cancelled",
+      "event_id": "evt_6c2e8a1f4d7b3a9d",
+      "session_id": "sess_2c91a7b4d23f1e89",
+      "timestamp": "2026-05-24T14:35:42.100Z",
+      "producer": {
+        "agent_id": "support-agent",
+        "agent_version": "3.0.1"
+      },
+      "urgency": "normal",
+      "cancelled_by": "timeout",
+      "cancellation_reason": "timeout_exceeded",
+      "summary_normal": "Session timed out after 5 minutes of inactivity.",
+      "summary_detailed": "Session was awaiting user confirmation for 300 seconds; default decision applied and session cancelled."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "language": "ig",
+  "name_native": "Asụsụ Igbo",
+  "name_english": "Igbo",
+  "tone_marks_required": true,
+  "recommended_pace_wpm": {"min": 110, "max": 150},
+  "fallback_languages": ["en"],
+  "translator_credits": [
+    {
+      "name": "Initial author review",
+      "level": "fluent",
+      "date": "2026-06-30",
+      "note": "Translations use standardized Onwu orthography with dot-below diacritics for ị, ọ, ụ. Tone marks (acute/grave) are written where they disambiguate meaning."
+    }
+  ],
+  "events": {
+    "aaep:agent.session.started": {
+      "summary_terse": "Mmalite",
+      "summary_normal": "Ana m amalite ọrụ gị",
+      "summary_detailed": "Ana m amalite ọrụ a rịọrọ banyere: {request_text}",
+      "notes": "'Ana m' = 'I am' (continuous). 'Amalite' = beginning. Standard greeting form."
+    },
+    "aaep:agent.session.completed": {
+      "summary_terse": "Emechara",
+      "summary_normal": "Emechara m ọrụ ahụ",
+      "summary_detailed": "Emechara m ọrụ ahụ na millisecond {duration_ms}. Ejiri m ngwa ọrụ {tool_invocations_count}.",
+      "notes": "'Emechara' = completed (perfective). 'Ọrụ ahụ' = 'that work/task'."
+    },
+    "aaep:agent.session.errored": {
+      "summary_terse": "Njehie",
+      "summary_normal": "Ọrụ ahụ enweghị ike ime n'ihi njehie",
+      "summary_detailed": "Ọrụ ahụ kụrụ aka n'ihi: {error_message}. Enwere ike idozi ya: {recoverable}",
+      "notes": "'Njehie' = error/mistake. 'Kụrụ aka' = literally 'hit hand' = failed."
+    },
+    "aaep:agent.session.cancelled": {
+      "summary_terse": "Akwụsịrị",
+      "summary_normal": "Akwụsịrị ọrụ ahụ",
+      "summary_detailed": "{cancelled_by} kwụsịrị ọrụ ahụ",
+      "notes": "'Akwụsịrị' = was stopped (passive). 'Kwụsịrị' = stopped (active)."
+    },
+    "aaep:agent.state.changed": {
+      "summary_terse": "Mgbanwe",
+      "summary_normal": "Agbanweela m gaa n'ọnọdụ {to_state}",
+      "summary_detailed": "Agbanweela m site na {from_state} gaa na {to_state}",
+      "notes": "'Mgbanwe' = change. 'Ọnọdụ' = state/position/situation."
+    },
+    "aaep:agent.progress.updated": {
+      "summary_terse": "Ọganihu",
+      "summary_normal": "Emechara m pasentị {progress_percent}",
+      "summary_detailed": "Emechara m pasentị {progress_percent}. {progress_message}",
+      "notes": "'Ọganihu' = progress. 'Pasentị' is a loanword commonly used in modern Igbo."
+    },
+    "aaep:agent.tool.invoked": {
+      "summary_terse": "Iji ngwa ọrụ",
+      "summary_normal": "Ana m eji ngwa ọrụ {tool}",
+      "summary_detailed": "Ana m eji ngwa ọrụ {tool} na nkọwa: {args_summary}",
+      "notes": "'Ngwa ọrụ' = tools/instruments (lit. 'work equipment'). 'Iji' = using."
+    },
+    "aaep:agent.tool.completed": {
+      "summary_terse": "Ngwa ọrụ kwụsịrị",
+      "summary_normal": "Ngwa ọrụ {tool} mechara",
+      "summary_detailed": "Ngwa ọrụ {tool} mechara na nsonaazụ: {status}",
+      "notes": "'Mechara' = completed. 'Nsonaazụ' = result/outcome."
+    },
+    "aaep:agent.output.streaming": {
+      "summary_terse": "",
+      "summary_normal": "",
+      "summary_detailed": "",
+      "notes": "Streaming events use empty summaries; chunk content is the speech."
+    },
+    "aaep:agent.awaiting.confirmation": {
+      "summary_terse": "Ịchọ nkwenye",
+      "summary_normal": "Ị kwere ka m mee {action}?",
+      "summary_detailed": "Ana m achọ nkwenye gị tupu m emee {action}. Nsonaazụ ya ga-abụ: {consequence}",
+      "notes": "'Ị kwere ka m mee X?' = 'do you agree that I do X?' — natural Igbo confirmation. 'Nkwenye' = consent/agreement."
+    },
+    "aaep:agent.awaiting.clarification": {
+      "summary_terse": "Ajụjụ",
+      "summary_normal": "{question}",
+      "summary_detailed": "Enwere m ajụjụ: {question}",
+      "notes": "'Ajụjụ' = question. Direct pass-through for question text."
+    },
+    "aaep:agent.handoff.requested": {
+      "summary_terse": "Nyefee onye ọzọ",
+      "summary_normal": "Ka m nyefee ọrụ a onye ọzọ n'ihi {reason}",
+      "summary_detailed": "Ka m nyefee ọrụ a {handoff_target} n'ihi: {reason}",
+      "notes": "'Nyefee' = hand over/give to. 'Onye ọzọ' = another person."
+    }
+  },
+  "common_phrases": {
+    "yes": "Ee",
+    "no": "Mba",
+    "please": "Biko",
+    "thank_you": "Daalụ",
+    "i_dont_know": "Amaghị m",
+    "wait": "Chere",
+    "try_again": "Nwaa ọzọ",
+    "this_is_important": "Nke a dị mkpa"
+  }
+}

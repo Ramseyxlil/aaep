@@ -1,0 +1,13 @@
+{
+  "@context": "https://aaep-protocol.org/context/v1",
+  "type": "aaep:agent.session.errored",
+  "event_id": "evt_baderrorevent01",
+  "session_id": "sess_baderrorsession",
+  "timestamp": "2026-06-30T14:22:25.115Z",
+  "producer": {
+    "agent_id": "buggy-agent"
+  },
+  "urgency": "normal",
+  "error_category": "transient",
+  "summary_normal": "Something went wrong."
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAEP — Agent Accessibility Event Protocol</title>
+  <meta name="description" content="An open standard for AI agents to communicate with assistive technology. Real-time, safety-aware, multilingual." />
+  <meta name="theme-color" content="#1a1a1a" />
+  <link rel="canonical" href="https://aaep-protocol.org/" />
+  <link rel="stylesheet" href="styles/main.css" />
+
+  <!-- Open Graph / social previews -->
+  <meta property="og:title" content="AAEP — Agent Accessibility Event Protocol" />
+  <meta property="og:description" content="An open standard for AI agents to communicate with assistive technology. Real-time, safety-aware, multilingual." />
+  <meta property="og:url" content="https://aaep-protocol.org/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+</head>
+<body>
+  <!-- Skip link for screen reader and keyboard users -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header role="banner">
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <span class="brand-mark">AAEP</span>
+        <span class="brand-full">Agent Accessibility Event Protocol</span>
+      </a>
+      <nav role="navigation" aria-label="Primary">
+        <ul>
+          <li><a href="/spec/">Specification</a></li>
+          <li><a href="/guides/">Guides</a></li>
+          <li><a href="https://github.com/Ramseyxlil/aaep">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============================ -->
+    <!-- HERO                          -->
+    <!-- ============================ -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-inner">
+        <h1 id="hero-heading">
+          An open standard for AI agents to communicate with assistive technology.
+        </h1>
+        <p class="hero-tagline">
+          Real-time. Safety-aware. Multilingual. Designed so the people most affected
+          by AI agents — disabled users — can use them as first-class citizens, not
+          afterthoughts.
+        </p>
+        <div class="hero-cta">
+          <a href="/guides/quickstart.html" class="btn btn-primary">
+            Quickstart
+          </a>
+          <a href="/spec/" class="btn btn-secondary">
+            Read the specification
+          </a>
+          <a href="https://github.com/Ramseyxlil/aaep" class="btn btn-tertiary">
+            View on GitHub
+          </a>
+        </div>
+        <p class="hero-version">
+          <strong>Version 1.0.0</strong> — released June&nbsp;30,&nbsp;2026 —
+          5-year stability commitment
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================ -->
+    <!-- WHY                           -->
+    <!-- ============================ -->
+    <section class="why" aria-labelledby="why-heading">
+      <div class="content">
+        <h2 id="why-heading">Why AAEP exists</h2>
+
+        <p class="lede">
+          When an AI agent acts on your behalf — sends an email, books a flight,
+          changes a record — assistive technology has no standard way to know
+          what's happening. AAEP is that standard.
+        </p>
+
+        <div class="why-grid">
+          <article>
+            <h3>Real-time, not after the fact</h3>
+            <p>
+              Screen readers, AAC devices, and other AT receive events as the
+              agent is acting — not after a wall of text appears. Users can
+              follow along, intervene before irreversible actions, and stay
+              informed without sighted oversight.
+            </p>
+          </article>
+
+          <article>
+            <h3>Safety by default</h3>
+            <p>
+              Irreversible high-risk actions (sending email, transferring money,
+              deleting files) emit a confirmation event with
+              <code>default_decision: "reject"</code>. If the user doesn't
+              respond, the action doesn't happen. This isn't optional — it's
+              a normative requirement.
+            </p>
+          </article>
+
+          <article>
+            <h3>Multilingual from day one</h3>
+            <p>
+              AAEP ships v1.0.0 with first-class support for Yoruba, Hausa, and
+              Igbo through the multilingual extension — three of West Africa's
+              most widely-spoken languages. Other accessibility specs added
+              non-English support years after launch. We started there.
+            </p>
+          </article>
+
+          <article>
+            <h3>Built for the long term</h3>
+            <p>
+              v1.x is supported for at least 5 years with full features, plus
+              2 years of security-only maintenance. AT software has long
+              product cycles; the protocols it integrates with must match
+              that horizon.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ -->
+    <!-- HOW IT WORKS                   -->
+    <!-- ============================ -->
+    <section class="how" aria-labelledby="how-heading">
+      <div class="content">
+        <h2 id="how-heading">How it works</h2>
+
+        <p>
+          AAEP defines event semantics. Producers (AI agents) emit events;
+          subscribers (assistive technology) consume them. The transport
+          is up to the implementer — HTTP/SSE, WebSocket, IPC, anything that
+          carries JSON.
+        </p>
+
+        <p>
+          Here's what an agent emits when it's about to send an email:
+        </p>
+
+        <pre><code>{
+  "type": "aaep:agent.awaiting.confirmation",
+  "session_id": "sess_abc123",
+  "timestamp": "2026-06-30T14:30:00Z",
+  "urgency": "critical",
+  "summary_normal": "Confirm sending email to alice@example.com",
+  "action": "Send email to alice@example.com with subject: Hello",
+  "consequence": "This action cannot be easily undone.",
+  "risk_level": "high",
+  "irreversible": true,
+  "default_decision": "reject",
+  "reply_token": "tok_xyz789",
+  "timeout_seconds": 300
+}</code></pre>
+
+        <p>
+          A subscriber (an NVDA add-on, a web React component, a
+          Narrator bridge) receives this event, announces it to the user,
+          waits for their decision, and replies. If the user does nothing,
+          the action is rejected by default. Safety is not opt-in.
+        </p>
+
+        <p>
+          <a href="/spec/04-event-types.html">See all 12 core event types →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================ -->
+    <!-- GET STARTED                   -->
+    <!-- ============================ -->
+    <section class="get-started" aria-labelledby="get-started-heading">
+      <div class="content">
+        <h2 id="get-started-heading">Get started</h2>
+
+        <div class="path-grid">
+          <article>
+            <h3>For agent developers</h3>
+            <p>You want your agent to be accessible to AT users.</p>
+            <ol>
+              <li>Read the <a href="/guides/quickstart.html">Quickstart Guide</a></li>
+              <li>Pick a <a href="/examples/producers/">reference producer</a> matching your stack (Python, TypeScript, LangChain, Anthropic SDK, Microsoft Agent Framework)</li>
+              <li>Wire AAEP emission into your existing agent</li>
+              <li>Verify with the <a href="/conformance/">conformance suite</a></li>
+            </ol>
+          </article>
+
+          <article>
+            <h3>For AT integrators</h3>
+            <p>You build screen readers, AAC software, or other assistive technology.</p>
+            <ol>
+              <li>Read the <a href="/guides/subscribers.html">Subscribers Guide</a></li>
+              <li>Study the <a href="/examples/subscribers/cli-debug/">reference subscriber</a></li>
+              <li>Build your AT-specific subscriber by replacing the rendering layer</li>
+              <li>Run the conformance suite against your subscriber</li>
+            </ol>
+          </article>
+
+          <article>
+            <h3>For procurement and compliance</h3>
+            <p>You're evaluating AAEP for your organization.</p>
+            <ol>
+              <li>Read <a href="/governance/">governance documents</a></li>
+              <li>Review the <a href="/governance/SECURITY.html">security policy</a> and threat model</li>
+              <li>Check the <a href="/governance/ROADMAP.html">roadmap</a> and stability commitments</li>
+              <li>Contact <a href="mailto:Abdulrafiu@izusoft.tech">Abdulrafiu@izusoft.tech</a> for partnership conversations</li>
+            </ol>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ -->
+    <!-- ADOPTERS                      -->
+    <!-- ============================ -->
+    <section class="adopters" aria-labelledby="adopters-heading">
+      <div class="content">
+        <h2 id="adopters-heading">Who's using AAEP</h2>
+        <p>
+          As of v1.0.0 launch, AAEP is new. The <a href="/governance/ADOPTERS.html">adopters list</a>
+          starts empty by design — we don't pad it with aspirational entries. Real adoption
+          takes time, and we'd rather start honest than start padded.
+        </p>
+        <p>
+          If your organization is evaluating AAEP, see the
+          <a href="/governance/ADOPTERS.html#how-to-be-added">listing process</a>.
+          Production-shipping adopters can be the first entry.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================ -->
+    <!-- COMMITMENTS                   -->
+    <!-- ============================ -->
+    <section class="commitments" aria-labelledby="commitments-heading">
+      <div class="content">
+        <h2 id="commitments-heading">What we commit to</h2>
+        <ul class="commitments-list">
+          <li><strong>Backward compatibility within v1.x</strong> for at least 5 years</li>
+          <li><strong>Security patches</strong> for v1.x through June 2033 (5 years full + 2 years security-only)</li>
+          <li><strong>Open governance</strong> with a defined path to broader Steering Committee as adoption grows</li>
+          <li><strong>Open foundation transfer</strong> when adoption thresholds are met (5+ implementations across 3+ organizations on 3+ continents)</li>
+          <li><strong>No paid certifications</strong> — conformance is objective and verifiable via the suite</li>
+          <li><strong>No vendor lock-in</strong> — spec is CC-BY-4.0, code is MIT</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-section">
+        <h2>Specification</h2>
+        <ul>
+          <li><a href="/spec/">Read the spec</a></li>
+          <li><a href="/spec/glossary.html">Glossary</a></li>
+          <li><a href="/schemas/v1/">Schemas</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h2>Guides</h2>
+        <ul>
+          <li><a href="/guides/quickstart.html">Quickstart</a></li>
+          <li><a href="/guides/implementers.html">Implementer's Guide</a></li>
+          <li><a href="/guides/subscribers.html">Subscribers Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h2>Community</h2>
+        <ul>
+          <li><a href="https://github.com/Ramseyxlil/aaep">GitHub</a></li>
+          <li><a href="/governance/CONTRIBUTING.html">Contributing</a></li>
+          <li><a href="/governance/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h2>About</h2>
+        <ul>
+          <li><a href="/governance/GOVERNANCE.html">Governance</a></li>
+          <li><a href="/governance/ROADMAP.html">Roadmap</a></li>
+          <li><a href="/governance/SECURITY.html">Security</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h2>Contact</h2>
+        <ul>
+          <li><a href="mailto:Abdulrafiu@izusoft.tech">General inquiries</a></li>
+          <li><a href="mailto:security@aaep-protocol.org">Security disclosures</a></li>
+          <li><a href="mailto:conduct@aaep-protocol.org">Code of Conduct</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <p>
+        AAEP version 1.0.0 — released June&nbsp;30,&nbsp;2026 —
+        spec under CC-BY-4.0 — reference implementations under MIT
+      </p>
+      <p>
+        Architected by <a href="mailto:Abdulrafiu@izusoft.tech">Abdulrafiu Izuafa</a>
+        in independent capacity. Marks held in trust per
+        <a href="/governance/TRADEMARK.html">trademark policy</a> until foundation transfer.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

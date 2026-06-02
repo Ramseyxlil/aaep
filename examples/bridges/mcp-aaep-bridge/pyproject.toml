@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aaep-mcp-bridge"
+version = "1.0.0"
+description = "Bidirectional bridge between the Model Context Protocol (MCP) and AAEP"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Abdulrafiu Izuafa", email = "Abdulrafiu@izusoft.tech" },
+]
+keywords = [
+    "aaep",
+    "accessibility",
+    "mcp",
+    "model-context-protocol",
+    "bridge",
+    "anthropic",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+]
+
+# Runtime dependencies kept minimal so the bridge works in mock mode without
+# needing the full MCP SDK. Install the [mcp] extra for real MCP integration.
+dependencies = [
+    "aaep-minimal-producer>=1.0.0",
+    "aiohttp>=3.9.0",
+]
+
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.0.0",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23.0",
+    "aaep-conformance>=1.0.0",
+    "ruff>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://aaep-protocol.org"
+Repository = "https://github.com/Ramseyxlil/aaep"
+"Bug Tracker" = "https://github.com/Ramseyxlil/aaep/issues"
+"Model Context Protocol" = "https://modelcontextprotocol.io/"
+"Reference Specification" = "https://aaep-protocol.org/spec/"
+
+[project.scripts]
+aaep-mcp-bridge = "aaep_mcp_bridge.server:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aaep_mcp_bridge*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+addopts = ["-v", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]

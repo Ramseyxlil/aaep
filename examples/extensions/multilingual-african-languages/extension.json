@@ -1,0 +1,87 @@
+{
+  "$schema": "https://aaep-protocol.org/schemas/v1/extension-manifest.json",
+  "extension_id": "aaep-ext-african-languages",
+  "version": "1.0.0",
+  "title": "Multilingual African Languages Extension",
+  "summary": "First-class support for Yoruba, Hausa, and Igbo in AAEP events",
+  "description": "Adds idiomatic translations of canonical AAEP event summaries into Yoruba, Hausa, and Igbo, with locale-aware speech-rate hints, tone-mark preservation rules, and pluralization helpers. Serves as the canonical worked example of the AAEP extension mechanism for non-English languages.",
+  "namespace": "ext_african_languages",
+  "supported_aaep_versions": [">=1.0.0", "<2.0.0"],
+  "conformance_class": "informational",
+  "authors": [
+    {
+      "name": "Abdulrafiu Izuafa",
+      "email": "Abdulrafiu@izusoft.tech",
+      "affiliation": "Independent",
+      "role": "Author and initial translator review coordinator"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://aaep-protocol.org/extensions/african-languages/",
+  "repository": "https://github.com/Ramseyxlil/aaep/tree/main/examples/extensions/multilingual-african-languages",
+  "languages": [
+    {
+      "tag": "yo",
+      "name_native": "Yorùbá",
+      "name_english": "Yoruba",
+      "speakers_estimated_millions": 50,
+      "script": ["latin"],
+      "tonal": true,
+      "regions": ["Nigeria", "Benin", "Togo", "Diaspora"]
+    },
+    {
+      "tag": "ha",
+      "name_native": "Hausa",
+      "name_english": "Hausa",
+      "speakers_estimated_millions": 80,
+      "script": ["latin", "ajami"],
+      "tonal": true,
+      "regions": ["Nigeria", "Niger", "Ghana", "Cameroon", "Chad", "Sudan", "Diaspora"]
+    },
+    {
+      "tag": "ig",
+      "name_native": "Asụsụ Igbo",
+      "name_english": "Igbo",
+      "speakers_estimated_millions": 30,
+      "script": ["latin"],
+      "tonal": true,
+      "regions": ["Nigeria", "Diaspora"]
+    }
+  ],
+  "schema_additions": {
+    "envelope_fields": [],
+    "event_types": [],
+    "capability_fields": [
+      {
+        "name": "ext_african_languages.preferred_dialect",
+        "type": "string",
+        "description": "Optional dialect identifier (e.g., 'lagos', 'oyo' for Yoruba)",
+        "required": false
+      },
+      {
+        "name": "ext_african_languages.tone_marks",
+        "type": "boolean",
+        "description": "Whether the subscriber's TTS supports Unicode tone marks",
+        "required": false,
+        "default": true
+      }
+    ]
+  },
+  "capability_signal": "aaep-ext-african-languages-1.0",
+  "translations_directory": "./translations",
+  "helper_functions": {
+    "translate_summary": "Look up the translation for a given event type + language",
+    "select_summary": "Pick the best language from a subscriber's preferred list with fallback chain",
+    "recommended_pace": "Return the recommended pace_wpm range for a language",
+    "pluralize": "Apply language-specific pluralization rules",
+    "preserve_tone_marks": "Verify Unicode diacritics are intact"
+  },
+  "test_data": {
+    "minimal_valid_event": {
+      "type": "aaep:agent.session.started",
+      "language": "yo",
+      "summary_normal": "Mò ń bẹ̀rẹ̀ iṣẹ́ rẹ"
+    }
+  },
+  "changelog_url": "https://github.com/Ramseyxlil/aaep/blob/main/examples/extensions/multilingual-african-languages/CHANGELOG.md"
+}

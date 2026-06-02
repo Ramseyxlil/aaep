@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aaep-maf-producer"
+version = "1.0.0"
+description = "AAEP integration for agents built on Microsoft Agent Framework"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Abdulrafiu Izuafa", email = "Abdulrafiu@izusoft.tech" },
+]
+keywords = [
+    "aaep",
+    "accessibility",
+    "agent",
+    "microsoft",
+    "azure",
+    "narrator",
+    "agent-framework",
+    "maf",
+    "example",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+]
+
+# Runtime dependencies. The Microsoft Agent Framework package is intentionally
+# NOT a required runtime dependency — we use graceful fallback so this example
+# can be installed and tested in environments without MAF (e.g., conformance CI).
+# To use real MAF integration, install with the [maf] extra:
+#     pip install aaep-maf-producer[maf]
+dependencies = [
+    "aaep-minimal-producer>=1.0.0",
+    "aiohttp>=3.9.0",
+]
+
+[project.optional-dependencies]
+maf = [
+    # Microsoft Agent Framework. Package name may be 'microsoft-agents' or
+    # 'agent-framework' depending on version. Adjust to your environment.
+    "microsoft-agents>=0.1.0",
+    "azure-identity>=1.15.0",
+    "openai>=1.20.0",
+]
+azure = [
+    # For Azure OpenAI / Azure AI Foundry integration
+    "azure-identity>=1.15.0",
+    "azure-ai-projects>=1.0.0b1",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23.0",
+    "aaep-conformance>=1.0.0",
+    "ruff>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://aaep-protocol.org"
+Repository = "https://github.com/Ramseyxlil/aaep"
+"Bug Tracker" = "https://github.com/Ramseyxlil/aaep/issues"
+"Reference Specification" = "https://aaep-protocol.org/spec/"
+"Implementer's Guide" = "https://aaep-protocol.org/guides/implementers/"
+"Microsoft Agent Framework" = "https://learn.microsoft.com/en-us/azure/ai-foundry/"
+
+[project.scripts]
+aaep-maf-demo = "aaep_maf.example_agent:main"
+aaep-maf-server = "aaep_maf.server:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aaep_maf*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+addopts = ["-v", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]

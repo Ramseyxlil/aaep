@@ -1,0 +1,127 @@
+AAEP — Agent Accessibility Event Protocol
+==========================================
+
+Copyright (c) 2026 Abdulrafiu Izuafa and AAEP contributors.
+
+This product includes the AAEP specification and reference materials,
+founded by Abdulrafiu Izuafa and developed openly with contributions
+from the global accessibility and AI agent communities.
+
+Project home:    https://github.com/Ramseyxlil/aaep
+Website:         https://aaep-protocol.org
+Maintainer:      Abdulrafiu Izuafa <Abdulrafiu@izusoft.tech>
+
+------------------------------------------------------------------------
+ATTRIBUTION REQUIREMENT
+------------------------------------------------------------------------
+
+Per the CC-BY-4.0 license that covers the specification and
+documentation, any redistribution, adaptation, or implementation that
+incorporates AAEP materials must preserve this NOTICE file or include
+equivalent attribution.
+
+Suggested attribution string for downstream users:
+
+    "This product includes work from the AAEP project
+    (https://github.com/Ramseyxlil/aaep), founded by Abdulrafiu Izuafa,
+    licensed under CC-BY-4.0 and MIT."
+
+------------------------------------------------------------------------
+PRIOR ART AND INSPIRATION
+------------------------------------------------------------------------
+
+AAEP draws conceptually and structurally from prior work in open
+standards. The following projects influenced AAEP's design. AAEP does
+not include or redistribute code from any of these projects unless
+otherwise noted; the references are acknowledgments of intellectual
+debt:
+
+  • W3C Web Accessibility Initiative (WAI), Accessible Rich Internet
+    Applications (WAI-ARIA) — for the model of a small, extensible
+    vocabulary that bridges authors and assistive technology.
+    https://www.w3.org/WAI/standards-guidelines/aria/
+
+  • W3C Activity Streams 2.0 and ActivityPub — for the @context-based
+    extension model and the use of JSON-LD for protocol payloads.
+    https://www.w3.org/TR/activitystreams-core/
+
+  • Model Context Protocol (MCP), Anthropic — for the contemporary
+    pattern of standardizing how LLM applications connect to external
+    capabilities, and as a complementary protocol that AAEP is
+    designed to coexist with.
+    https://modelcontextprotocol.io/
+
+  • IETF RFC 9110 (HTTP Semantics) — for the discipline of separating
+    a protocol's wire format from its transport and for the model of
+    versioned, extensible specifications.
+    https://www.rfc-editor.org/rfc/rfc9110
+
+  • Microsoft Research, "From Struggle to Success: Context-Aware
+    Guidance for Screen Reader Users in Computer Use" (CHI 2026,
+    Chen et al.) — for establishing the research direction of
+    LLM-mediated accessibility and motivating the need for the
+    complementary infrastructure AAEP provides.
+    https://arxiv.org/abs/2601.18092
+
+  • IETF RFC 7807 / RFC 9457 (Problem Details for HTTP APIs) — for the
+    pattern of structured, machine-readable error reporting reflected
+    in AAEP's session.errored event.
+    https://www.rfc-editor.org/rfc/rfc9457
+
+------------------------------------------------------------------------
+THIRD-PARTY MATERIALS BUNDLED WITH THIS REPOSITORY
+------------------------------------------------------------------------
+
+This repository may include third-party dependencies in the
+conformance test suite, examples, and tools. Each such dependency is
+governed by its own license, declared in the relevant manifest file
+(pyproject.toml, package.json, Cargo.toml, etc.).
+
+At the time of initial release, no third-party code is vendored
+directly into this repository. All dependencies are referenced through
+standard package managers and installed at build time.
+
+If you contribute code that bundles third-party material, you must:
+
+  (a) Confirm the third-party license is compatible with MIT.
+  (b) Add an entry to this NOTICE file identifying the material, its
+      origin, and its license.
+  (c) Preserve the third-party copyright notice within the bundled
+      file.
+
+------------------------------------------------------------------------
+TRADEMARKS
+------------------------------------------------------------------------
+
+"AAEP" and the AAEP logo (forthcoming) are intended to function as
+identifiers of conformance with this specification. Use of the AAEP
+name to identify a product or service as AAEP-compliant is permitted
+provided the product or service passes the corresponding conformance
+level defined in spec/09-conformance.md.
+
+Use of the AAEP name in ways that imply endorsement by AAEP
+maintainers, beyond a factual statement of conformance, requires
+written permission from the maintainer.
+
+Other product names and brands referenced in AAEP materials
+(Microsoft, Narrator, JAWS, NVDA, VoiceOver, TalkBack, Anthropic,
+Claude, OpenAI, LangChain, AutoGen, Semantic Kernel, Microsoft Agent
+Framework, and others) are trademarks of their respective owners.
+References to these names in AAEP documentation are for descriptive
+and interoperability purposes only and do not imply endorsement.
+
+------------------------------------------------------------------------
+CONTRIBUTORS
+------------------------------------------------------------------------
+
+A current list of contributors is maintained automatically in the
+Git history of this repository and surfaced on the project website.
+
+Significant contributions, including formative study participants,
+spec co-authors, and disabled developers who reviewed or shaped the
+protocol's design, are credited individually in the spec's
+acknowledgments section (spec/SPEC.md) and in governance/MAINTAINERS.md.
+
+------------------------------------------------------------------------
+End of NOTICE.
+------------------------------------------------------------------------

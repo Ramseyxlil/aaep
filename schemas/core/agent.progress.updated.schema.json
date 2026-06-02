@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/core/agent.progress.updated.schema.json",
+  "title": "AAEP Event: agent.progress.updated",
+  "description": "Reports incremental progress through a long-running task. Use sparingly to avoid event flood: emit at meaningful boundaries (e.g., every 5%, not every 1%). Subscribers MAY suppress progress events entirely if the user has configured low cognitive load mode. Defined normatively in Chapter 4 §4.2.2 of the AAEP specification.",
+
+  "allOf": [
+    { "$ref": "https://aaep-protocol.org/schemas/v1/envelope.schema.json" }
+  ],
+
+  "type": "object",
+  "required": ["type", "progress"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'aaep:agent.progress.updated'.",
+      "const": "aaep:agent.progress.updated"
+    },
+    "progress": {
+      "description": "Structured progress information. MUST contain at least one of: percent, step, total_steps, description.",
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "percent": {
+          "description": "Completion percentage from 0 to 100. May be a non-integer (e.g., 47.5).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "step": {
+          "description": "Current step number, 1-indexed.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "total_steps": {
+          "description": "Total number of steps in the task, if known. step <= total_steps when both are present.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": {
+          "description": "Brief description of the current step.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        { "required": ["percent"] },
+        { "required": ["step"] },
+        { "required": ["total_steps"] },
+        { "required": ["description"] }
+      ]
+    },
+    "summary_terse": {
+      "description": "Terse progress announcement. Example: '60 percent.'",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "summary_normal": {
+      "description": "Normal progress announcement combining the relevant progress fields into a sentence.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "summary_detailed": {
+      "description": "Detailed progress with context.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "eta_ms": {
+      "description": "Estimated milliseconds to completion. May change between updates as the producer revises its estimate.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400000
+    }
+  },
+
+  "examples": [
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.progress.updated",
+      "event_id": "evt_2e6c9a3f1d8b4e7a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:18.701Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "background",
+      "progress": {
+        "percent": 60
+      }
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.progress.updated",
+      "event_id": "evt_2e6c9a3f1d8b4e7a",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:18.701Z",
+      "producer": {
+        "agent_id": "retirement-planner",
+        "agent_version": "1.4.2"
+      },
+      "urgency": "background",
+      "progress": {
+        "percent": 60,
+        "step": 3,
+        "total_steps": 5,
+        "description": "Calculating retirement projections"
+      },
+      "summary_terse": "60 percent.",
+      "summary_normal": "Calculating retirement projections, 60 percent complete.",
+      "eta_ms": 12000
+    },
+    {
+      "@context": "https://aaep-protocol.org/context/v1",
+      "type": "aaep:agent.progress.updated",
+      "event_id": "evt_2e6c9a3f1d8b4e7b",
+      "session_id": "sess_2c91a7b4d23f1e88",
+      "timestamp": "2026-05-24T14:22:25.101Z",
+      "producer": {
+        "agent_id": "data-processor",
+        "agent_version": "2.1.0"
+      },
+      "urgency": "background",
+      "progress": {
+        "step": 4,
+        "total_steps": 12,
+        "description": "Processing record 4 of 12"
+      },
+      "summary_normal": "Processing records, 4 of 12 done."
+    }
+  ]
+}

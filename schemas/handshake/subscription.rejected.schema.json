@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaep-protocol.org/schemas/v1/handshake/subscription.rejected.schema.json",
+  "title": "AAEP Message: subscription.rejected",
+  "description": "Producer's rejection of a subscription.request. Carries a machine-readable reason_code and a human-readable reason_message. Producers MUST respond to every subscription.request with either subscription.accepted or subscription.rejected; silent failure is non-conforming. Defined normatively in Chapter 5 §5.5 of the AAEP specification.",
+
+  "type": "object",
+  "required": ["type", "reason_code", "reason_message"],
+
+  "properties": {
+    "type": {
+      "description": "MUST be the literal value 'subscription.rejected'.",
+      "const": "subscription.rejected"
+    },
+    "reason_code": {
+      "description": "Machine-readable reason for the rejection. MUST be one of the eight normative codes defined in Chapter 5 §5.5.3.",
+      "type": "string",
+      "enum": [
+        "version_unsupported",
+        "manifest_signature_required",
+        "capabilities_incompatible",
+        "rate_limit",
+        "authentication_required",
+        "authorization_denied",
+        "transport_unavailable",
+        "unknown"
+      ]
+    },
+    "reason_message": {
+      "description": "Human-readable description of the rejection. SHOULD provide enough detail for the subscriber to understand what went wrong without exposing sensitive details about the producer's internal state.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "retry_after_seconds": {
+      "description": "If the subscriber should try again, after how many seconds. Typically used with reason_code 'rate_limit' or 'transport_unavailable'.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400
+    },
+    "alternative_manifest_uri": {
+      "description": "URI to a manifest describing what the producer can offer. Useful when reason_code is 'capabilities_incompatible' so the subscriber can adjust its request.",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+
+  "additionalProperties": false,
+
+  "examples": [
+    {
+      "type": "subscription.rejected",
+      "reason_code": "version_unsupported",
+      "reason_message": "Producer supports AAEP v1.0.0 only; subscriber requested v0.9.0 which is not implemented."
+    },
+    {
+      "type": "subscription.rejected",
+      "reason_code": "rate_limit",
+      "reason_message": "Producer has reached maximum concurrent subscriptions. Try again later.",
+      "retry_after_seconds": 60
+    },
+    {
+      "type": "subscription.rejected",
+      "reason_code": "manifest_signature_required",
+      "reason_message": "Subscriber requested signed manifests but producer does not currently sign manifests. Update producer configuration or set accept_signed_manifests_only=false.",
+      "alternative_manifest_uri": "https://example.com/.well-known/aaep-manifest.json"
+    },
+    {
+      "type": "subscription.rejected",
+      "reason_code": "capabilities_incompatible",
+      "reason_message": "Subscriber requested only Yoruba, but producer does not have Yoruba translations available. See alternative manifest for supported languages.",
+      "alternative_manifest_uri": "https://example.com/.well-known/aaep-manifest.json"
+    },
+    {
+      "type": "subscription.rejected",
+      "reason_code": "authentication_required",
+      "reason_message": "This producer requires Bearer token authentication. Include an Authorization header on subscription.request."
+    }
+  ]
+}

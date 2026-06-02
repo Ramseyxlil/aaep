@@ -1,0 +1,144 @@
+# This CITATION.cff file makes AAEP citable in academic and industry work.
+# GitHub uses this file to generate a "Cite this repository" button and
+# downloadable BibTeX, APA, and other citation formats automatically.
+#
+# Format specification: https://citation-file-format.github.io/
+# Validator:            https://github.com/citation-file-format/cff-converter-python
+
+cff-version: 1.2.0
+
+message: >-
+  If you reference AAEP (the Agent Accessibility Event Protocol) in
+  academic publications, industry reports, technical documentation,
+  standards proposals, or related materials, please cite this
+  repository using the metadata below.
+
+title: "AAEP: Agent Accessibility Event Protocol"
+
+abstract: >-
+  AAEP (Agent Accessibility Event Protocol) is an open protocol that
+  enables AI agents to communicate their lifecycle, state, tool
+  invocations, and confirmation requests to assistive technology in a
+  standardized, vendor-neutral, programming-language-neutral format.
+  AAEP defines a wire format, a subscription handshake, a confirmation
+  reply mechanism, and an extension model that together let any
+  AAEP-compliant agent interoperate with any AAEP-compliant assistive
+  technology, including screen readers, voice control, switch control,
+  and assistive devices yet to be invented. The protocol is designed
+  to coexist with the Model Context Protocol (MCP) and to be
+  integrable into any agent framework (Microsoft Agent Framework,
+  AutoGen, LangChain, Semantic Kernel, the Anthropic SDK, custom
+  implementations) without requiring framework-specific libraries
+  from the AAEP project itself.
+
+type: software
+
+version: "0.1.0-draft"
+
+date-released: "2026-05-24"
+
+url: "https://aaep-protocol.org"
+
+repository-code: "https://github.com/Ramseyxlil/aaep"
+
+license:
+  - CC-BY-4.0
+  - MIT
+
+keywords:
+  - accessibility
+  - assistive technology
+  - artificial intelligence
+  - AI agents
+  - human-AI interaction
+  - protocol
+  - open standard
+  - screen readers
+  - inclusive design
+  - WCAG
+  - WAI-ARIA
+  - agentic AI
+  - HCI
+  - disability
+
+authors:
+  - family-names: Izuafa
+    given-names: Abdulrafiu
+    email: Abdulrafiu@izusoft.tech
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # Replace with real ORCID before public release
+    affiliation: "Founder, AAEP project"
+    website: "https://abdulrafiu.xyz"
+
+contact:
+  - family-names: Izuafa
+    given-names: Abdulrafiu
+    email: Abdulrafiu@izusoft.tech
+
+identifiers:
+  - type: url
+    value: "https://github.com/Ramseyxlil/aaep"
+    description: "Canonical repository for the AAEP specification and reference materials."
+
+# A preferred citation entry can be added once AAEP has an accompanying
+# academic publication (e.g., at ACM ASSETS, CHI, or W3C TPAC).
+# Until then, citing this repository directly is the recommended form.
+#
+# preferred-citation:
+#   type: conference-paper
+#   title: "AAEP: An Open Protocol for Agent Accessibility"
+#   authors:
+#     - family-names: Izuafa
+#       given-names: Abdulrafiu
+#   year: 2027
+#   conference:
+#     name: "ACM ASSETS"
+#   doi: "10.1145/forthcoming"
+
+references:
+  - type: standard
+    title: "Accessible Rich Internet Applications (WAI-ARIA) 1.2"
+    institution:
+      name: "W3C"
+    url: "https://www.w3.org/TR/wai-aria-1.2/"
+    year: 2023
+
+  - type: standard
+    title: "ActivityStreams 2.0"
+    institution:
+      name: "W3C"
+    url: "https://www.w3.org/TR/activitystreams-core/"
+    year: 2017
+
+  - type: standard
+    title: "HTTP Semantics (RFC 9110)"
+    institution:
+      name: "IETF"
+    url: "https://www.rfc-editor.org/rfc/rfc9110"
+    year: 2022
+
+  - type: software
+    title: "Model Context Protocol (MCP)"
+    authors:
+      - name: "Anthropic"
+    url: "https://modelcontextprotocol.io/"
+    year: 2024
+
+  - type: conference-paper
+    title: "From Struggle to Success: Context-Aware Guidance for Screen Reader Users in Computer Use"
+    authors:
+      - family-names: Chen
+        given-names: Nan
+      - family-names: Lu
+        given-names: Jing
+      - family-names: Wang
+        given-names: Zilong
+      - family-names: Qiu
+        given-names: "Luna K."
+      - family-names: Chen
+        given-names: Siming
+      - family-names: Yang
+        given-names: Yuqing
+    conference:
+      name: "ACM CHI 2026"
+    year: 2026
+    url: "https://arxiv.org/abs/2601.18092"

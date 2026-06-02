@@ -1,0 +1,86 @@
+{
+  "$schema": "https://aaep-protocol.org/schemas/v1/extension-manifest.json",
+  "extension_id": "aaep-ext-medical-hipaa",
+  "version": "1.0.0",
+  "title": "Medical HIPAA-Aware Extension",
+  "summary": "Privacy and audit constraints for AAEP in US healthcare contexts",
+  "description": "Adds HIPAA-aware PHI redaction rules, Business Associate Agreement (BAA) capability negotiation, medical-domain risk classification, audit metadata aligned with HL7 standards, and medical-specific critical event subtypes. Does not by itself make a system HIPAA-compliant; provides protocol-layer building blocks.",
+  "namespace": "ext_medical_hipaa",
+  "supported_aaep_versions": [">=1.0.0", "<2.0.0"],
+  "conformance_class": "informational",
+  "authors": [
+    {
+      "name": "Abdulrafiu Izuafa",
+      "email": "Abdulrafiu@izusoft.tech",
+      "affiliation": "Independent",
+      "role": "Author"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://aaep-protocol.org/extensions/medical-hipaa/",
+  "repository": "https://github.com/Ramseyxlil/aaep/tree/main/examples/extensions/medical-hipaa",
+  "schema_additions": {
+    "envelope_fields": [
+      {
+        "name": "ext_medical_hipaa.audit_metadata",
+        "type": "object",
+        "description": "HIPAA audit metadata (purpose_of_use, user_role, patient_identifier_hash)",
+        "required": false
+      }
+    ],
+    "event_types": [
+      {
+        "name": "aaep:agent.medical.alert",
+        "description": "Clinical-significance alert (drug interaction, abnormal lab, allergy)",
+        "extends": "aaep:agent.awaiting.confirmation"
+      },
+      {
+        "name": "aaep:agent.medical.override_required",
+        "description": "Agent requires credentialed override to proceed",
+        "extends": "aaep:agent.awaiting.confirmation"
+      }
+    ],
+    "capability_fields": [
+      {
+        "name": "ext_medical_hipaa.producer_phi_redaction",
+        "type": "string",
+        "description": "Redaction strictness level",
+        "enum": ["strict", "relaxed", "none"],
+        "required": false,
+        "default": "strict"
+      },
+      {
+        "name": "ext_medical_hipaa.baa_in_force",
+        "type": "boolean",
+        "description": "Whether a BAA is in force between producer and subscriber",
+        "required": false,
+        "default": false
+      },
+      {
+        "name": "ext_medical_hipaa.baa_party",
+        "type": "string",
+        "description": "Name of the BAA counterparty",
+        "required": false
+      },
+      {
+        "name": "ext_medical_hipaa.baa_document_id",
+        "type": "string",
+        "description": "Reference to the BAA document",
+        "required": false
+      }
+    ]
+  },
+  "capability_signal": "aaep-ext-medical-hipaa-1.0",
+  "helper_functions": {
+    "redact_phi": "Apply PHI redaction patterns to a string",
+    "classify_medical_risk": "Return risk assessment for a medical tool name",
+    "audit_metadata_for": "Build a standards-aligned audit metadata block",
+    "hash_patient_identifier": "Hash an MRN or similar patient ID for audit logs"
+  },
+  "external_references": [
+    "https://www.hhs.gov/hipaa/for-professionals/index.html",
+    "https://terminology.hl7.org/CodeSystem-v3-PurposeOfUse.html",
+    "https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/minimum-necessary-requirement/index.html"
+  ],
+  "compliance_disclaimer": "This extension is informational and does not constitute legal or compliance advice. Operators MUST consult qualified counsel before clinical deployment."
+}

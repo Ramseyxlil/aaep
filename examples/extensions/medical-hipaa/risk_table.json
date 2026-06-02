@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "description": "Default medical-domain risk classifications. Override per deployment via RiskConfig.",
+  "categories": {
+    "prescribe_medication": {
+      "risk_level": "high",
+      "irreversible": true,
+      "rationale": "Once a prescription is filled and dispensed, the action is irreversible. Drug interactions and dosing errors can cause harm."
+    },
+    "renew_prescription": {
+      "risk_level": "high",
+      "irreversible": true,
+      "rationale": "Same considerations as prescribe_medication."
+    },
+    "discontinue_medication": {
+      "risk_level": "high",
+      "irreversible": false,
+      "rationale": "Reversible (can be re-prescribed) but high-risk for conditions requiring uninterrupted therapy."
+    },
+    "order_lab_test": {
+      "risk_level": "high",
+      "irreversible": false,
+      "rationale": "Reversible (can be cancelled before draw) but has cost and patient-time implications."
+    },
+    "order_imaging": {
+      "risk_level": "high",
+      "irreversible": false,
+      "rationale": "Reversible (can be cancelled) but X-ray, CT, and PET expose patients to ionizing radiation."
+    },
+    "send_referral": {
+      "risk_level": "high",
+      "irreversible": false,
+      "rationale": "Reversible with effort (can be withdrawn) but creates appointments and patient expectations."
+    },
+    "update_medical_record": {
+      "risk_level": "high",
+      "irreversible": false,
+      "rationale": "Reversible with audit trail; record edits are tracked but not retroactively removable."
+    },
+    "create_clinical_note": {
+      "risk_level": "medium",
+      "irreversible": false,
+      "rationale": "Reversible with audit; signed notes become part of the legal record."
+    },
+    "read_patient_chart": {
+      "risk_level": "medium",
+      "irreversible": false,
+      "rationale": "Reversible (no state change) but generates audit log entries per HIPAA."
+    },
+    "search_drug_database": {
+      "risk_level": "low",
+      "irreversible": false,
+      "rationale": "Read-only reference lookup with no patient-identifier exposure."
+    },
+    "lookup_icd_code": {
+      "risk_level": "low",
+      "irreversible": false,
+      "rationale": "Reference lookup of diagnostic codes; no patient data accessed."
+    },
+    "check_drug_interaction": {
+      "risk_level": "low",
+      "irreversible": false,
+      "rationale": "Computed against drug database; no patient data persisted."
+    },
+    "schedule_appointment": {
+      "risk_level": "medium",
+      "irreversible": false,
+      "rationale": "Reversible (can be cancelled) but creates patient and staff commitments."
+    },
+    "cancel_appointment": {
+      "risk_level": "medium",
+      "irreversible": false,
+      "rationale": "Reversible (can be re-scheduled) but disrupts care continuity."
+    }
+  }
+}

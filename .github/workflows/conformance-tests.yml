@@ -1,0 +1,264 @@
+# Conformance tests workflow.
+#
+# Runs the AAEP conformance suite against every reference implementation
+# on every PR and push to main. Conformance is the bedrock — if a reference
+# implementation fails, the bar for what "AAEP conformant" means has shifted.
+#
+# Strategy:
+#   - Matrix across Python versions (3.10, 3.11, 3.12) AND implementations
+#   - Each combination runs Level 1, 2, and 3 conformance
+#   - Failures block merge
+
+name: Conformance Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly to catch dependency drift even with no commits
+    - cron: "0 6 * * 1"  # Mondays 06:00 UTC
+  workflow_dispatch:
+
+# Cancel in-progress runs when a new commit is pushed to the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  # ===========================================================
+  # Job 1: Self-test the conformance suite itself
+  # ===========================================================
+  conformance-self-test:
+    name: Conformance suite self-test (Py ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install conformance suite
+        working-directory: conformance/aaep_conformance
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Run self-test suite
+        working-directory: conformance/aaep_conformance
+        run: pytest -v --tb=short
+
+      - name: Validate all bundled fixtures
+        working-directory: conformance/aaep_conformance
+        run: |
+          python -m aaep_conformance.cli validate-fixtures \
+            --fixtures-dir aaep_conformance/fixtures
+
+  # ===========================================================
+  # Job 2: Run each reference Python producer against L1+L2+L3
+  # ===========================================================
+  python-producers:
+    name: ${{ matrix.producer }} conformance (Py ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    needs: conformance-self-test
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11"]  # One version is enough for producer matrix
+        producer:
+          - python-minimal
+          - python-langchain
+          - python-anthropic-sdk
+          - python-microsoft-agent-framework
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install conformance suite
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./conformance/aaep_conformance
+
+      - name: Install producer ${{ matrix.producer }}
+        working-directory: examples/producers/${{ matrix.producer }}
+        run: pip install -e .
+
+      - name: Start producer in background
+        working-directory: examples/producers/${{ matrix.producer }}
+        env:
+          # Test-mode API keys (producers should run without real ones)
+          ANTHROPIC_API_KEY: "test-key-not-real"
+          MICROSOFT_AGENT_FRAMEWORK_CLIENT_ID: "test-id"
+        run: |
+          # Determine port from producer name (each example uses a fixed port)
+          case "${{ matrix.producer }}" in
+            python-minimal) PORT=8080 ;;
+            python-langchain) PORT=8081 ;;
+            python-anthropic-sdk) PORT=8082 ;;
+            python-microsoft-agent-framework) PORT=8083 ;;
+          esac
+          echo "Starting on port $PORT"
+          # Start in background; redirect logs
+          python -m "${{ matrix.producer }}.server" --port "$PORT" \
+            > /tmp/producer.log 2>&1 &
+          echo $! > /tmp/producer.pid
+          # Wait for it to be ready (up to 30 seconds)
+          for i in $(seq 1 30); do
+            if curl -sf "http://localhost:$PORT/health" > /dev/null; then
+              echo "Producer ready on port $PORT"
+              echo "PRODUCER_PORT=$PORT" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Producer failed to start. Logs:"
+          cat /tmp/producer.log
+          exit 1
+
+      - name: Run Level 1 conformance
+        run: |
+          python -m aaep_conformance.cli run \
+            --endpoint "http://localhost:${PRODUCER_PORT}" \
+            --level 1 \
+            --output /tmp/level1.json
+
+      - name: Run Level 2 conformance
+        run: |
+          python -m aaep_conformance.cli run \
+            --endpoint "http://localhost:${PRODUCER_PORT}" \
+            --level 2 \
+            --output /tmp/level2.json
+
+      - name: Run Level 3 conformance
+        run: |
+          python -m aaep_conformance.cli run \
+            --endpoint "http://localhost:${PRODUCER_PORT}" \
+            --level 3 \
+            --output /tmp/level3.json
+
+      - name: Upload conformance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-${{ matrix.producer }}-py${{ matrix.python }}
+          path: /tmp/level*.json
+          retention-days: 30
+
+      - name: Stop producer
+        if: always()
+        run: |
+          if [[ -f /tmp/producer.pid ]]; then
+            kill "$(cat /tmp/producer.pid)" || true
+          fi
+          echo "--- producer logs ---"
+          cat /tmp/producer.log || true
+
+  # ===========================================================
+  # Job 3: TypeScript producer
+  # ===========================================================
+  typescript-producer:
+    name: typescript-minimal conformance
+    runs-on: ubuntu-latest
+    needs: conformance-self-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: examples/producers/typescript-minimal/package-lock.json
+
+      - name: Install dependencies
+        working-directory: examples/producers/typescript-minimal
+        run: npm ci
+
+      - name: Build
+        working-directory: examples/producers/typescript-minimal
+        run: npm run build
+
+      - name: Start producer in background
+        working-directory: examples/producers/typescript-minimal
+        run: |
+          npm run start -- --port 8084 > /tmp/producer.log 2>&1 &
+          echo $! > /tmp/producer.pid
+          for i in $(seq 1 30); do
+            if curl -sf "http://localhost:8084/health" > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/producer.log
+          exit 1
+
+      - name: Set up Python for conformance suite
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install conformance suite
+        run: pip install -e ./conformance/aaep_conformance
+
+      - name: Run all three levels
+        run: |
+          for level in 1 2 3; do
+            python -m aaep_conformance.cli run \
+              --endpoint "http://localhost:8084" \
+              --level "$level" \
+              --output "/tmp/level${level}.json"
+          done
+
+      - name: Upload conformance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-typescript-minimal
+          path: /tmp/level*.json
+          retention-days: 30
+
+  # ===========================================================
+  # Aggregate gate: at least one job per category must pass
+  # ===========================================================
+  conformance-gate:
+    name: Conformance gate
+    if: always()
+    needs:
+      - conformance-self-test
+      - python-producers
+      - typescript-producer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that no upstream job failed
+        run: |
+          if [[ "${{ needs.conformance-self-test.result }}" != "success" ]]; then
+            echo "Conformance self-test FAILED"
+            exit 1
+          fi
+          if [[ "${{ needs.python-producers.result }}" != "success" ]]; then
+            echo "Python producers FAILED"
+            exit 1
+          fi
+          if [[ "${{ needs.typescript-producer.result }}" != "success" ]]; then
+            echo "TypeScript producer FAILED"
+            exit 1
+          fi
+          echo "All conformance checks passed."

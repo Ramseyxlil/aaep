@@ -1,0 +1,242 @@
+/* ===============================================================
+ * AAEP Web Subscriber — Default Styles
+ *
+ * Importable via:
+ *     import "@aaep/web-subscriber-react/styles.css";
+ *
+ * These styles are deliberately minimal and use CSS custom properties
+ * so consumers can override colors and spacing without editing the source.
+ * They respect prefers-reduced-motion and prefers-color-scheme.
+ * =============================================================== */
+
+.aaep-subscriber {
+  --aaep-color-bg: #ffffff;
+  --aaep-color-text: #1a1a1a;
+  --aaep-color-muted: #6b7280;
+  --aaep-color-accent: #2563eb;
+  --aaep-color-success: #16a34a;
+  --aaep-color-danger: #dc2626;
+  --aaep-color-border: #e5e7eb;
+  --aaep-color-focus: #2563eb;
+  --aaep-color-dialog-bg: #ffffff;
+  --aaep-color-dialog-shadow: rgba(0, 0, 0, 0.15);
+  --aaep-radius: 0.5rem;
+  --aaep-spacing-sm: 0.5rem;
+  --aaep-spacing-md: 1rem;
+  --aaep-spacing-lg: 1.5rem;
+  --aaep-font-stack: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  font-family: var(--aaep-font-stack);
+  color: var(--aaep-color-text);
+}
+
+.aaep-theme-dark {
+  --aaep-color-bg: #1a1a1a;
+  --aaep-color-text: #f5f5f5;
+  --aaep-color-muted: #9ca3af;
+  --aaep-color-border: #374151;
+  --aaep-color-dialog-bg: #2d2d2d;
+  --aaep-color-dialog-shadow: rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  .aaep-theme-auto {
+    --aaep-color-bg: #1a1a1a;
+    --aaep-color-text: #f5f5f5;
+    --aaep-color-muted: #9ca3af;
+    --aaep-color-border: #374151;
+    --aaep-color-dialog-bg: #2d2d2d;
+    --aaep-color-dialog-shadow: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ARIA live regions: visually hidden but accessible to screen readers.
+ * We do NOT use display:none because that hides from screen readers too. */
+.aaep-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Confirmation and clarification dialogs */
+.aaep-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--aaep-color-dialog-bg);
+  color: var(--aaep-color-text);
+  border: 1px solid var(--aaep-color-border);
+  border-radius: var(--aaep-radius);
+  padding: var(--aaep-spacing-lg);
+  max-width: min(90vw, 500px);
+  box-shadow: 0 10px 25px var(--aaep-color-dialog-shadow);
+  z-index: 9999;
+}
+
+.aaep-confirmation {
+  border-left: 4px solid var(--aaep-color-danger);
+}
+
+.aaep-clarification {
+  border-left: 4px solid var(--aaep-color-accent);
+}
+
+.aaep-dialog-title {
+  margin: 0 0 var(--aaep-spacing-md) 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.aaep-dialog-body {
+  margin: 0 0 var(--aaep-spacing-md) 0;
+  color: var(--aaep-color-muted);
+}
+
+.aaep-dialog-actions {
+  display: flex;
+  gap: var(--aaep-spacing-sm);
+  margin-top: var(--aaep-spacing-md);
+}
+
+.aaep-dialog-timeout {
+  margin-top: var(--aaep-spacing-md);
+  font-size: 0.875rem;
+  color: var(--aaep-color-muted);
+  text-align: right;
+}
+
+/* Buttons */
+.aaep-button {
+  padding: var(--aaep-spacing-sm) var(--aaep-spacing-md);
+  border: 1px solid var(--aaep-color-border);
+  border-radius: var(--aaep-radius);
+  background: var(--aaep-color-bg);
+  color: var(--aaep-color-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aaep-button {
+    transition: none;
+  }
+}
+
+.aaep-button:hover {
+  border-color: var(--aaep-color-focus);
+}
+
+.aaep-button:focus-visible {
+  outline: 2px solid var(--aaep-color-focus);
+  outline-offset: 2px;
+}
+
+.aaep-button-accept {
+  background: var(--aaep-color-success);
+  border-color: var(--aaep-color-success);
+  color: white;
+}
+
+.aaep-button-reject {
+  background: var(--aaep-color-danger);
+  border-color: var(--aaep-color-danger);
+  color: white;
+}
+
+.aaep-button-option {
+  text-align: left;
+  width: 100%;
+}
+
+/* Clarification options list */
+.aaep-options-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--aaep-spacing-sm);
+}
+
+/* Event log */
+.aaep-event-log {
+  margin-top: var(--aaep-spacing-md);
+  border: 1px solid var(--aaep-color-border);
+  border-radius: var(--aaep-radius);
+  padding: var(--aaep-spacing-sm);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+.aaep-event-log summary {
+  cursor: pointer;
+  padding: var(--aaep-spacing-sm);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aaep-log-clear {
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--aaep-color-border);
+  border-radius: var(--aaep-radius);
+  cursor: pointer;
+}
+
+.aaep-log-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--aaep-spacing-sm) 0 0 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.aaep-log-entry {
+  padding: var(--aaep-spacing-sm);
+  border-bottom: 1px solid var(--aaep-color-border);
+  display: flex;
+  gap: var(--aaep-spacing-sm);
+}
+
+.aaep-log-entry:last-child {
+  border-bottom: 0;
+}
+
+.aaep-log-critical {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.aaep-log-type {
+  color: var(--aaep-color-accent);
+  flex-shrink: 0;
+}
+
+.aaep-log-summary {
+  color: var(--aaep-color-text);
+  word-break: break-word;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .aaep-button {
+    border: 1px solid CanvasText;
+  }
+  .aaep-button-accept,
+  .aaep-button-reject {
+    forced-color-adjust: none;
+  }
+}

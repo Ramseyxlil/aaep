@@ -1,0 +1,100 @@
+{
+  "language": "yo",
+  "name_native": "Yorùbá",
+  "name_english": "Yoruba",
+  "tone_marks_required": true,
+  "recommended_pace_wpm": {"min": 110, "max": 150},
+  "fallback_languages": ["en"],
+  "translator_credits": [
+    {
+      "name": "Initial author review",
+      "level": "fluent",
+      "date": "2026-06-30",
+      "note": "Translations reviewed for idiomatic usage by an L1 Yoruba speaker. Community contributions welcome via the standard ACP process."
+    }
+  ],
+  "events": {
+    "aaep:agent.session.started": {
+      "summary_terse": "Ìbẹ̀rẹ̀",
+      "summary_normal": "Mò ń bẹ̀rẹ̀ iṣẹ́ rẹ",
+      "summary_detailed": "Mò ń bẹ̀rẹ̀ iṣẹ́ tó béèrè nípa: {request_text}",
+      "notes": "Greeting at session start. Tone marks on ẹ̀ and ẹ́ encode meaning."
+    },
+    "aaep:agent.session.completed": {
+      "summary_terse": "Ó parí",
+      "summary_normal": "Mo parí iṣẹ́ náà",
+      "summary_detailed": "Mo parí iṣẹ́ náà ní ìṣẹ́jú àáyá {duration_ms}. Mo lo ohun-èlò {tool_invocations_count}.",
+      "notes": "Past-tense completion. 'Ó parí' is most natural way to say 'it is done'."
+    },
+    "aaep:agent.session.errored": {
+      "summary_terse": "Àṣìṣe",
+      "summary_normal": "Iṣẹ́ náà kò ṣe é ṣe nítorí àṣìṣe",
+      "summary_detailed": "Iṣẹ́ náà kò ṣe é ṣe nítorí: {error_message}. Ṣe é le ṣe síi sí? {recoverable}",
+      "notes": "'Àṣìṣe' is the standard term for error/mistake."
+    },
+    "aaep:agent.session.cancelled": {
+      "summary_terse": "Dáwọ́dúró",
+      "summary_normal": "A ti dáwọ́dúró iṣẹ́ náà",
+      "summary_detailed": "Iṣẹ́ náà ti dáwọ́dúró nípasẹ̀ {cancelled_by}",
+      "notes": "Passive construction common in Yoruba for cancellations."
+    },
+    "aaep:agent.state.changed": {
+      "summary_terse": "Ìyípadà",
+      "summary_normal": "Mo ti yípadà sí ipò {to_state}",
+      "summary_detailed": "Mo ti yípadà láti {from_state} sí {to_state}",
+      "notes": "State transitions; verb 'yípadà' = change/transform."
+    },
+    "aaep:agent.progress.updated": {
+      "summary_terse": "Ìlọsíwájú",
+      "summary_normal": "Mo ti parí ìdá {progress_percent} nínú ọgọ́rùn-ún",
+      "summary_detailed": "Mo ti parí ìdá {progress_percent} nínú ọgọ́rùn-ún. {progress_message}",
+      "notes": "Yoruba expresses percent as 'parts of a hundred' (ọgọ́rùn-ún)."
+    },
+    "aaep:agent.tool.invoked": {
+      "summary_terse": "Lílo ohun-èlò",
+      "summary_normal": "Mò ń lo ohun-èlò {tool}",
+      "summary_detailed": "Mò ń lo ohun-èlò {tool} pẹ̀lú àwọn àlàyé: {args_summary}",
+      "notes": "'Ohun-èlò' = tool/instrument; literal 'thing of use'."
+    },
+    "aaep:agent.tool.completed": {
+      "summary_terse": "Ohun-èlò parí",
+      "summary_normal": "Ohun-èlò {tool} parí",
+      "summary_detailed": "Ohun-èlò {tool} parí pẹ̀lú àbájáde: {status}",
+      "notes": "Tool completion. 'Àbájáde' = result/outcome."
+    },
+    "aaep:agent.output.streaming": {
+      "summary_terse": "",
+      "summary_normal": "",
+      "summary_detailed": "",
+      "notes": "Streaming events use empty summaries; chunk content is the speech. Match core spec."
+    },
+    "aaep:agent.awaiting.confirmation": {
+      "summary_terse": "Béèrè ìfọwọ́sí",
+      "summary_normal": "Ṣé kí n ṣe {action}?",
+      "summary_detailed": "Mò ń béèrè ìfọwọ́sí rẹ kí n tó ṣe {action}. Wọ́ọ̀, kí ni ìpadàbọ̀ rẹ̀: {consequence}",
+      "notes": "'Ṣé kí n ṣe X?' = 'should I do X?' — conventional Yoruba way to ask permission."
+    },
+    "aaep:agent.awaiting.clarification": {
+      "summary_terse": "Ìbéèrè",
+      "summary_normal": "{question}",
+      "summary_detailed": "Mo ní ìbéèrè kan: {question}",
+      "notes": "Pass through the question text directly; preamble adds context."
+    },
+    "aaep:agent.handoff.requested": {
+      "summary_terse": "Fífún ẹlòmíì",
+      "summary_normal": "Mo ní láti fún ẹlòmíì níṣẹ́ nítorí {reason}",
+      "summary_detailed": "Mo ní láti fún {handoff_target} níṣẹ́ nítorí: {reason}",
+      "notes": "Handoff = passing the task to another agent/human; literally 'give-someone-task'."
+    }
+  },
+  "common_phrases": {
+    "yes": "Bẹ́ẹ̀ni",
+    "no": "Bẹ́ẹ̀kọ́",
+    "please": "Jọ̀wọ́",
+    "thank_you": "Ẹ ṣé",
+    "i_dont_know": "Mi ò mọ̀",
+    "wait": "Dúró",
+    "try_again": "Tún gbìyànjú",
+    "this_is_important": "Èyí ṣe pàtàkì"
+  }
+}
