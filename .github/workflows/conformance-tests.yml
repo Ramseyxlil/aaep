@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload conformance reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: conformance-${{ matrix.producer }}-py${{ matrix.python }}
           path: /tmp/level*.json
@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload conformance reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: conformance-typescript-minimal
           path: /tmp/level*.json
