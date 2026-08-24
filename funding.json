@@ -1,0 +1,77 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Abdulrafiu Izuafa",
+    "email": "Abdulrafiu@izusoft.tech",
+    "phone": "",
+    "description": "I build accessibility infrastructure for AI systems. I created AAEP, the Agent Accessibility Event Protocol, and I maintain it along with its reference packages on PyPI and npm and its open conformance suite. I am a Microsoft MVP and a software engineer. AAEP is the project I am seeking funding to maintain and grow.",
+    "webpageUrl": {
+      "url": "https://aaep-protocol.org",
+      "wellKnown": "https://aaep-protocol.org/.well-known/funding-manifest-urls"
+    }
+  },
+  "projects": [
+    {
+      "guid": "aaep",
+      "name": "AAEP: Agent Accessibility Event Protocol",
+      "description": "AAEP is an open protocol that lets AI agents tell assistive technology what they are doing, in a format any screen reader, voice control, or alternative input device can understand. AI agents are shipping into chat apps, IDEs, customer service portals, and mobile assistants. For the more than one billion people who use assistive technology, these agents are often unusable: state changes are invisible, tool calls are silent, streaming output floods the screen reader, and irreversible actions happen without a surfaced confirmation. Every team solves this differently or not at all, because there is no shared language between agents and assistive technology. AAEP is that shared language. It defines twelve standard event types, three conformance levels, and an open test suite that verifies any claim of support. The spec is CC-BY-4.0, the code is MIT, and no single vendor can take it private. v1.0.0 shipped in June 2026 with a five-year support window. Reference packages are published on PyPI and npm, and the protocol works with Microsoft Agent Framework, LangChain, Semantic Kernel, the Anthropic SDK, OpenAI, and custom agents, across Narrator, NVDA, JAWS, VoiceOver, and TalkBack.",
+      "webpageUrl": {
+        "url": "https://aaep-protocol.org",
+        "wellKnown": "https://aaep-protocol.org/.well-known/funding-manifest-urls"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/Ramseyxlil/aaep",
+        "wellKnown": ""
+      },
+      "licenses": [
+        "spdx:CC-BY-4.0",
+        "spdx:MIT"
+      ],
+      "tags": [
+        "accessibility",
+        "a11y",
+        "assistive-technology",
+        "ai-agents",
+        "open-standard",
+        "protocol",
+        "screen-reader"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github-sponsors",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/Ramseyxlil",
+        "description": "GitHub Sponsors is the preferred channel for receiving the grant."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "aaep-12-month-plan",
+        "status": "active",
+        "name": "AAEP maintenance and adoption, 12 months",
+        "description": "One year of funded work on AAEP: maintaining the v1.x spec and the reference packages on PyPI and npm, expanding the conformance test suite, building more producer and subscriber integrations, and running adoption and documentation work with disabled developers and users.",
+        "amount": 25000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "github-sponsors"
+        ]
+      }
+    ],
+    "history": [
+      {
+        "year": 2026,
+        "income": 0,
+        "expenses": 0,
+        "taxes": 0,
+        "currency": "USD",
+        "description": "AAEP v1.0.0 was designed, built, and shipped without external funding."
+      }
+    ]
+  }
+}
