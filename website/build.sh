@@ -47,6 +47,7 @@ log "Writing .well-known/funding-manifest-urls"
 mkdir -p "$DIST/.well-known"
 echo "https://raw.githubusercontent.com/Ramseyxlil/aaep/main/funding.json" > "$DIST/.well-known/funding-manifest-urls"
 touch "$DIST/.nojekyll"
+cp "$ROOT/funding.json" "$DIST/funding.json"
 
 if [[ -d "$ROOT/schemas" ]]; then
   log "Copying JSON schemas to /schemas/v1/"
