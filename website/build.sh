@@ -372,4 +372,4 @@ for f in index.html 404.html styles/main.css CNAME; do
 done
 
 log "Build complete."
-log "Preview: open $DIST/index.html"
+log "Preview: open $DIST/index.html"cp "$ROOT/funding.json" "$DIST/funding.json"
