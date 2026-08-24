@@ -43,6 +43,10 @@ cp "$SRC/404.html" "$DIST/404.html"
 log "Writing CNAME for custom domain"
 echo "aaep-protocol.org" > "$DIST/CNAME"
 
+log "Writing .well-known/funding-manifest-urls"
+mkdir -p "$DIST/.well-known"
+echo "https://raw.githubusercontent.com/Ramseyxlil/aaep/main/funding.json" > "$DIST/.well-known/funding-manifest-urls"
+
 if [[ -d "$ROOT/schemas" ]]; then
   log "Copying JSON schemas to /schemas/v1/"
   mkdir -p "$DIST/schemas/v1"
